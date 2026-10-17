@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pangangaluluwa · English Picture Quiz</title>
+  <style>
+    :root { color-scheme: dark; --bg:#101523; --panel:#1d2637; --panel2:#263249; --text:#f9f5ed; --muted:#c4cbd7; --gold:#f4be62; --green:#8bdeb2; --red:#ffa29a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 75% 0%,#42304b 0%,transparent 38%),linear-gradient(145deg,#101523,#182335 70%,#28202b); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); }
+    .shell { width:min(1080px,calc(100% - 32px)); margin:42px auto; }
+    .topline { text-transform:uppercase; letter-spacing:.23em; font-weight:750; font-size:.75rem; color:var(--gold); }
+    h1 { font-size:clamp(2rem,5vw,3.55rem); line-height:1.1; margin:13px 0 12px; }
+    .intro { max-width:760px; color:var(--muted); line-height:1.65; margin-bottom:28px; }
+    .panel { border:1px solid #ffffff27; background:#1d2637e6; border-radius:24px; padding:clamp(20px,4vw,38px); box-shadow:0 24px 65px #0006; }
+    .hidden { display:none !important; }
+    .dialogue { display:grid; gap:12px; margin:20px 0 26px; }
+    .voice { margin:0; padding:14px 18px; border-left:4px solid var(--gold); border-radius:10px; background:#ffffff0b; color:var(--text); line-height:1.65; }
+    .voice:nth-child(even) { border-color:#a5b8f2; }
+    .voice strong { display:block; margin-bottom:4px; color:var(--gold); }
+    .voice:nth-child(even) strong { color:#c6d2ff; }
+    .eyebrow { font-size:.8rem; text-transform:uppercase; letter-spacing:.13em; font-weight:700; color:var(--gold); }
+    .action { cursor:pointer; background:var(--gold); color:#27202a; padding:13px 25px; font-weight:800; font-size:1rem; border:0; border-radius:13px; transition:filter .2s,transform .2s; }
+    .action:hover { filter:brightness(1.1); transform:translateY(-2px); }
+    .action:focus-visible, .answer:focus-visible { outline:3px solid white; outline-offset:3px; }
+    .bar-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; color:var(--muted); font-size:.92rem; margin-bottom:12px; }
+    .progress { height:9px; background:#0c1424; border-radius:30px; overflow:hidden; margin-bottom:27px; }
+    .fill { height:100%; width:0; background:linear-gradient(90deg,#d99145,#f4be62); transition:width .35s; }
+    h2 { font-size:clamp(1.25rem,3vw,1.9rem); margin:8px 0 10px; }
+    .hint { color:var(--muted); margin-bottom:24px; }
+    .answers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .answer { position:relative; width:100%; text-align:left; background:var(--panel2); color:var(--text); padding:9px 9px 14px; border:2px solid #ffffff26; border-radius:17px; cursor:pointer; transition:border-color .2s,transform .2s; font:inherit; overflow:hidden; }
+    .answer:not(:disabled):hover { border-color:var(--gold); transform:translateY(-3px); }
+    .answer:disabled { cursor:default; }
+    .answer img { display:block; width:100%; height:175px; object-fit:cover; border-radius:10px; background:#34445e; }
+    .answer-label { display:block; margin:12px 6px 0; font-weight:730; }
+    .answer.correct { border-color:var(--green); background:#214439; }
+    .answer.incorrect { border-color:var(--red); background:#502f38; }
+    .answer.correct .answer-label::after { content:" ✓"; color:var(--green); }
+    .answer.incorrect .answer-label::after { content:" ✕"; color:var(--red); }
+    .feedback { min-height:64px; padding-top:20px; line-height:1.6; font-weight:640; }
+    .feedback.good { color:var(--green); } .feedback.bad { color:var(--red); }
+    .next-row { display:flex; justify-content:flex-end; margin-top:10px; }
+    .score { font-size:clamp(3rem,9vw,5rem); font-weight:850; color:var(--gold); margin:12px 0; }
+    .review { text-align:left; color:var(--muted); margin:24px 0; padding-left:20px; line-height:1.6; }
+    .review li { margin-bottom:10px; }
+    footer { text-align:center; color:#bcc4d1; font-size:.85rem; margin:25px 0; }
+    @media(max-width:620px) { .shell{margin:20px auto;} .answers{gap:10px;} .answer img{height:120px;} .answer-label{font-size:.85rem;} .panel{border-radius:18px;} }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topline">Filipino traditions · Easy English</div>
+    <h1>Pangangaluluwa: Songs for the Souls</h1>
+    <p class="intro">In some places in the Philippines, people visit homes and sing special songs. They remember people who have died. Learn about Pangangaluluwa with ten picture questions.</p>
+
+    <section class="panel" id="welcome">
+      <span class="eyebrow">Listen and learn</span>
+      <h2>A special Filipino tradition</h2>
+      <p class="hint">Read each question. Choose one of four pictures. You will see if your answer is right. Each correct answer gives you one point.</p>
+      <div class="dialogue" aria-label="Short story with two voices">
+        <p class="voice"><strong>Voice 1</strong> Welcome! Today we will learn about Pangangaluluwa. It is an old tradition in the Philippines.</p>
+        <p class="voice"><strong>Voice 2</strong> Some people dress like spirits. They walk from house to house. They sing special songs.</p>
+        <p class="voice"><strong>Voice 1</strong> The songs ask for prayers for the dead. Families may give food or a little money.</p>
+        <p class="voice"><strong>Voice 2</strong> This is a time to remember people we love. Are you ready? Let us play!</p>
+      </div>
+      <button class="action" id="start" type="button">Start the quiz →</button>
+    </section>
+
+    <section class="panel hidden" id="quiz" aria-live="polite">
+      <div class="bar-meta"><span id="counter">Question 1 of 10</span><span id="scoreLive">Score: 0</span></div>
+      <div class="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progress"><div class="fill" id="fill"></div></div>
+      <span class="eyebrow">Choose the correct picture</span>
+      <h2 id="question"></h2>
+      <p class="hint" id="helpText">Only one answer is correct.</p>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+      <div class="next-row"><button type="button" class="action hidden" id="next">Next question →</button></div>
+    </section>
+
+    <section class="panel hidden" id="results" aria-live="polite">
+      <span class="eyebrow">Quiz complete</span>
+      <h2>Well done!</h2>
+      <div class="score" id="finalScore"></div>
+      <p id="closing"></p>
+      <h3>Look at the answers</h3>
+      <ol class="review" id="review"></ol>
+      <button class="action" type="button" id="restart">Play again ↻</button>
+    </section>
+    <footer>An English learning activity about a Filipino tradition. Customs can be different in different places.</footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    // =============================================================
+    // 1. PERSONALIZACIÓN: modifica SOLO este array para cambiar el quiz.
+    // Cada pregunta contiene:
+    // - pregunta: texto mostrado.
+    // - opciones: EXACTAMENTE cuatro objetos { texto, imagen, emoji }.
+    //   imagen: URL o ruta, p. ej. "imagenes/almas.jpg". Si está vacío,
+    //   aparece una ilustración SVG generada a partir de emoji y texto.
+    // - correcta: índice de la opción verdadera, empezando en 0 (0,1,2,3).
+    // - explicacion: mensaje que aparece después de responder.
+    // =============================================================
+    const preguntas = [
+      {
+        pregunta: "What do some people wear?",
+        opciones: [
+          { texto:"Costumes like movie vampires", imagen:"", emoji:"🧛" },
+          { texto:"White sheets like spirits", imagen:"", emoji:"👻" },
+          { texto:"Clothes like old soldiers", imagen:"", emoji:"⚔️" },
+          { texto:"Bright clothes for a parade", imagen:"", emoji:"🎭" }
+        ], correcta:1,
+        explicacion:"Some people wear white or dark sheets. They look like spirits."
+      },
+      {
+        pregunta:"What do people do at houses?",
+        opciones:[
+          { texto:"They play ball games", imagen:"", emoji:"🏀" },
+          { texto:"They drive big cars", imagen:"", emoji:"🚗" },
+          { texto:"They sing special songs", imagen:"", emoji:"🎶" },
+          { texto:"They fly colorful kites", imagen:"", emoji:"🪁" }
+        ], correcta:2,
+        explicacion:"People go from house to house. They sing special songs."
+      },
+      {
+        pregunta:"Who do the singers represent?",
+        opciones:[
+          { texto:"Souls who need prayers", imagen:"", emoji:"🕯️" },
+          { texto:"Kings from an old castle", imagen:"", emoji:"👑" },
+          { texto:"Pirates on the sea", imagen:"", emoji:"🏴‍☠️" },
+          { texto:"People who travel in space", imagen:"", emoji:"🚀" }
+        ], correcta:0,
+        explicacion:"The singers act like souls. The songs ask people to pray for them."
+      },
+      {
+        pregunta:"What can families give the singers?",
+        opciones:[
+          { texto:"New balls for games", imagen:"", emoji:"⚽" },
+          { texto:"Tools to build houses", imagen:"", emoji:"🧰" },
+          { texto:"Tickets to watch movies", imagen:"", emoji:"🎟️" },
+          { texto:"Food or a little money", imagen:"", emoji:"🍚" }
+        ], correcta:3,
+        explicacion:"Families may give food or a little money. Each town has its own customs."
+      },
+      {
+        pregunta:"When does Pangangaluluwa take place?",
+        opciones:[
+          { texto:"Around All Saints’ Day", imagen:"", emoji:"🕯️" },
+          { texto:"On Valentine’s Day in February", imagen:"", emoji:"💝" },
+          { texto:"On New Year’s Day", imagen:"", emoji:"🎆" },
+          { texto:"During the summer school break", imagen:"", emoji:"🏖️" }
+        ], correcta:0,
+        explicacion:"People usually do this around October 31 and November 1. Dates can change by town."
+      },
+      {
+        pregunta:"Where is Pangangaluluwa from?",
+        opciones:[
+          { texto:"It comes from Italy", imagen:"", emoji:"🇮🇹" },
+          { texto:"It comes from the Philippines", imagen:"", emoji:"🇵🇭" },
+          { texto:"It comes from Canada", imagen:"", emoji:"🇨🇦" },
+          { texto:"It comes from India", imagen:"", emoji:"🇮🇳" }
+        ], correcta:1,
+        explicacion:"Pangangaluluwa is a tradition in the Philippines."
+      },
+      {
+        pregunta:"What food can families give?",
+        opciones:[
+          { texto:"A large cheese pizza", imagen:"", emoji:"🍕" },
+          { texto:"A big beef burger", imagen:"", emoji:"🍔" },
+          { texto:"Suman, a Filipino rice cake", imagen:"", emoji:"🍙" },
+          { texto:"A bowl of spaghetti", imagen:"", emoji:"🍝" }
+        ], correcta:2,
+        explicacion:"Suman is a Filipino rice cake. It is one kind of kakanin."
+      },
+      {
+        pregunta:"What do people do for the dead?",
+        opciones:[
+          { texto:"They make loud fireworks", imagen:"", emoji:"🎇" },
+          { texto:"They run in races", imagen:"", emoji:"🏁" },
+          { texto:"They buy many gifts", imagen:"", emoji:"🎁" },
+          { texto:"They say prayers for them", imagen:"", emoji:"🙏" }
+        ], correcta:3,
+        explicacion:"People pray for those who have died. Prayer is important in this tradition."
+      },
+      {
+        pregunta:"What can this tradition teach us?",
+        opciones:[
+          { texto:"Remember and help other people", imagen:"", emoji:"🤝" },
+          { texto:"Try to make more money", imagen:"", emoji:"💰" },
+          { texto:"Stay away from all people", imagen:"", emoji:"🚪" },
+          { texto:"Buy new phones every year", imagen:"", emoji:"📱" }
+        ], correcta:0,
+        explicacion:"People sing, share food, and remember the dead together."
+      },
+      {
+        pregunta:"What is special about Pangangaluluwa?",
+        opciones:[
+          { texto:"Buying many new toys", imagen:"", emoji:"🧸" },
+          { texto:"Prayers for people who died", imagen:"", emoji:"🕊️" },
+          { texto:"Watching many scary movies", imagen:"", emoji:"🎬" },
+          { texto:"Playing video games for prizes", imagen:"", emoji:"🎮" }
+        ], correcta:1,
+        explicacion:"Like Halloween, people may wear costumes. But prayers and memory are important here."
+      }
+    ];
+
+    // =============================================================
+    // 2. GENERACIÓN DE IMÁGENES: ilustraciones SVG integradas.
+    // Puedes sustituirlas por fotografías simplemente rellenando "imagen".
+    // El escape evita interpretar los textos de opciones como código HTML.
+    // =============================================================
+    const escapar = texto => String(texto).replace(/[&<>"']/g, caracter =>
+      ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[caracter]
+    );
+    function ilustracion(opcion, indice) {
+      const paletas = [["#56416b","#29354d"],["#525e77","#273d4a"],["#76534d","#49364e"],["#475d58","#293d44"]];
+      const [inicio, fin] = paletas[indice % paletas.length];
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="340" viewBox="0 0 640 340">
+        <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${inicio}"/><stop offset="1" stop-color="${fin}"/></linearGradient></defs>
+        <rect width="640" height="340" fill="url(#g)"/>
+        <circle cx="548" cy="64" r="67" fill="#f4be62" opacity=".13"/>
+        <circle cx="94" cy="285" r="115" fill="#fff" opacity=".06"/>
+        <text x="320" y="207" text-anchor="middle" font-size="126" font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">${escapar(opcion.emoji || "🕯️")}</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    // =============================================================
+    // 3. FUNCIONAMIENTO DEL QUIZ: no hace falta cambiar este bloque.
+    // =============================================================
+    const $ = id => document.getElementById(id);
+    let actual = 0, aciertos = 0, respondida = false;
+    let historial = [];
+
+    function mostrar(seccion) {
+      ["welcome","quiz","results"].forEach(id => $(id).classList.toggle("hidden", id !== seccion));
+    }
+    function iniciar() {
+      actual = 0; aciertos = 0; respondida = false; historial = [];
+      mostrar("quiz"); pintarPregunta();
+    }
+    function pintarPregunta() {
+      respondida = false;
+      const p = preguntas[actual];
+      $("question").textContent = p.pregunta;
+      $("counter").textContent = `Question ${actual + 1} of ${preguntas.length}`;
+      $("scoreLive").textContent = `Score: ${aciertos}`;
+      $("fill").style.width = `${(actual / preguntas.length) * 100}%`;
+      $("progress").setAttribute("aria-valuenow", String(actual));
+      $("feedback").textContent = "";
+      $("feedback").className = "feedback";
+      $("next").classList.add("hidden");
+      const contenedor = $("answers"); contenedor.replaceChildren();
+      p.opciones.forEach((opcion, indice) => {
+        const boton = document.createElement("button");
+        boton.type = "button"; boton.className = "answer";
+        const img = document.createElement("img");
+        img.src = opcion.imagen || ilustracion(opcion, indice);
+        img.alt = opcion.texto;
+        img.loading = "eager";
+        // Una URL rota vuelve a la ilustración local.
+        img.addEventListener("error", () => {
+          const alternativa = ilustracion(opcion, indice);
+          if (img.src !== alternativa) img.src = alternativa;
+        }, { once:true });
+        const texto = document.createElement("span");
+        texto.className = "answer-label"; texto.textContent = opcion.texto;
+        boton.append(img, texto);
+        boton.addEventListener("click", () => responder(indice));
+        contenedor.append(boton);
+      });
+    }
+    function responder(indice) {
+      if (respondida) return; // Impide sumar puntos varias veces.
+      respondida = true;
+      const p = preguntas[actual];
+      const esCorrecta = indice === p.correcta;
+      if (esCorrecta) aciertos++;
+      historial.push({ pregunta:p.pregunta, correcta:p.opciones[p.correcta].texto, acertada:esCorrecta });
+      [...$("answers").children].forEach((boton, i) => {
+        boton.disabled = true;
+        if (i === p.correcta) boton.classList.add("correct");
+        else if (i === indice) boton.classList.add("incorrect");
+      });
+      $("feedback").className = `feedback ${esCorrecta ? "good" : "bad"}`;
+      $("feedback").textContent = `${esCorrecta ? "Correct!" : "Not quite."} ${p.explicacion}`;
+      $("scoreLive").textContent = `Score: ${aciertos}`;
+      $("next").textContent = actual === preguntas.length - 1 ? "See results →" : "Next question →";
+      $("next").classList.remove("hidden");
+    }
+    function continuar() {
+      if (!respondida) return;
+      actual++;
+      if (actual < preguntas.length) pintarPregunta();
+      else finalizar();
+    }
+    function finalizar() {
+      mostrar("results");
+      $("finalScore").textContent = `${aciertos} / ${preguntas.length}`;
+      $("closing").textContent = aciertos === preguntas.length
+        ? "Excellent! All ten answers are correct."
+        : "You finished the quiz! Read the answers. You can try again.";
+      $("fill").style.width = "100%";
+      const lista = $("review"); lista.replaceChildren();
+      historial.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.acertada ? "✓" : "✕"} ${item.pregunta} — ${item.correcta}`;
+        lista.append(li);
+      });
+    }
+    // Comprobación para detectar errores al editar el banco de preguntas.
+    if (preguntas.length !== 10 || preguntas.some(p =>
+      p.opciones.length !== 4 || !Number.isInteger(p.correcta) || p.correcta < 0 || p.correcta > 3
+    )) {
+      throw new Error("The quiz must have 10 questions, four choices each, and a correct index from 0 to 3.");
+    }
+    $("start").addEventListener("click", iniciar);
+    $("next").addEventListener("click", continuar);
+    $("restart").addEventListener("click", iniciar);
+  </script>
+</body>
+</html>
