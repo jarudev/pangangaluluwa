@@ -4,252 +4,1443 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pangangaluluwa · English Picture Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: dark; --bg:#101523; --panel:#1d2637; --panel2:#263249; --text:#f9f5ed; --muted:#c4cbd7; --gold:#f4be62; --green:#8bdeb2; --red:#ffa29a; }
+    :root {
+      color-scheme: dark;
+      --night:#1a1024; --velvet:#2b1838; --velvet-2:#24142f;
+      --pumpkin:#e8772e; --gold:#e2bd78; --bone:#efe6d4; --dust:#c7b9ad;
+      --moss:#7f9a52; --wine:#a33a48;
+      --display:"IM Fell English", "Iowan Old Style", Georgia, serif;
+      --body:"EB Garamond", Garamond, Georgia, serif;
+      --corner:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23e2bd78'%3E%3Cpath d='M3 62V22Q3 3 22 3H62' stroke-width='1.6'/%3E%3Cpath d='M11 62V28Q11 11 28 11H62' stroke-width='.8' opacity='.6'/%3E%3Ccircle cx='22' cy='22' r='3.2' fill='%23e8772e' stroke='none'/%3E%3Cpath d='M22 13q6 3 6 9t-6 9q-6-3-6-9t6-9' stroke-width='.8' opacity='.7'/%3E%3C/svg%3E");
+    }
     * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:radial-gradient(circle at 75% 0%,#42304b 0%,transparent 38%),linear-gradient(145deg,#101523,#182335 70%,#28202b); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); }
-    .shell { width:min(1080px,calc(100% - 32px)); margin:42px auto; }
-    .topline { text-transform:uppercase; letter-spacing:.23em; font-weight:750; font-size:.75rem; color:var(--gold); }
-    h1 { font-size:clamp(2rem,5vw,3.55rem); line-height:1.1; margin:13px 0 12px; }
-    .intro { max-width:760px; color:var(--muted); line-height:1.65; margin-bottom:28px; }
-    .panel { border:1px solid #ffffff27; background:#1d2637e6; border-radius:24px; padding:clamp(20px,4vw,38px); box-shadow:0 24px 65px #0006; }
+    html { background:var(--night); }
+    body {
+      margin:0; min-height:100vh; color:var(--bone);
+      font-family:var(--body); font-size:1.18rem; line-height:1.7;
+      background:
+        radial-gradient(ellipse 75% 42% at 50% 104%, #8a3a17 0%, #4a1f2a 42%, transparent 78%),
+        radial-gradient(circle at 80% 14%, #3e2b57 0%, transparent 38%),
+        linear-gradient(#110a1a 0%, #1d1029 55%, #2a1425 100%);
+      background-attachment:fixed;
+    }
+
+    /* ---------- Escena de fondo ---------- */
+    .scene { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .scene svg { width:100%; height:100%; display:block; }
+    .bats { animation:drift 46s ease-in-out infinite alternate; }
+    @keyframes drift { from { transform:translate(-40px, 6px); } to { transform:translate(70px, -14px); } }
+    .flicker { animation:flicker 3.2s ease-in-out infinite; }
+    @keyframes flicker { 0%,100% { opacity:.9; } 45% { opacity:.65; } 60% { opacity:1; } }
+
+    /* ---------- Estructura ---------- */
+    .shell { position:relative; z-index:1; width:min(880px, calc(100% - 32px)); margin:0 auto; padding:64px 0 40px; }
+    header { text-align:center; margin-bottom:34px; }
+    .kicker { font-family:var(--display); font-style:italic; color:var(--gold); font-size:1.15rem; margin:0; }
+    h1 { font-family:var(--display); font-weight:400; font-size:clamp(2.6rem, 7.4vw, 4.6rem); line-height:1.02; margin:.2em 0 .1em; letter-spacing:.01em; text-shadow:0 0 28px #e8772e55, 0 2px 0 #0008; }
+    h1 span { display:block; font-size:.48em; font-style:italic; color:var(--gold); margin-top:.35em; }
+    .divider { display:block; width:min(340px, 80%); height:24px; margin:18px auto 20px; }
+    .intro { max-width:34em; margin:0 auto; color:var(--dust); text-shadow:0 1px 5px #000, 0 0 16px #000; }
+    .qr-card {
+      position:fixed; top:clamp(205px, 26vh, 260px); left:clamp(16px, 3vw, 48px); z-index:2;
+      display:block; width:160px; padding:6px; text-align:center; text-decoration:none;
+      color:var(--bone); background:#1a1024ed; border:1px solid #e2bd7866;
+      box-shadow:0 8px 24px #0009; font-size:.95rem; line-height:1.25;
+    }
+    .qr-card img { display:block; width:100%; height:auto; background:#fff; image-rendering:pixelated; }
+    .qr-card span { display:block; margin-top:7px; }
+    .qr-card:hover { border-color:var(--gold); }
+    .qr-card:focus-visible { outline:2px solid var(--bone); outline-offset:4px; }
+
+    .panel {
+      position:relative; padding:clamp(26px, 5vw, 52px);
+      background:linear-gradient(180deg, #2b1838f2, #1f1129f2);
+      border:1px solid #e2bd7866;
+      box-shadow:inset 0 0 0 7px #2b1838, inset 0 0 0 8px #e2bd782e, 0 30px 80px #000a, 0 0 120px #e8772e1a;
+      backdrop-filter:blur(3px);
+    }
+    .panel::before, .panel::after { content:""; position:absolute; width:64px; height:64px; background:var(--corner) no-repeat; pointer-events:none; }
+    .panel::before { top:-1px; left:-1px; }
+    .panel::after { bottom:-1px; right:-1px; transform:rotate(180deg); }
     .hidden { display:none !important; }
-    .dialogue { display:grid; gap:12px; margin:20px 0 26px; }
-    .voice { margin:0; padding:14px 18px; border-left:4px solid var(--gold); border-radius:10px; background:#ffffff0b; color:var(--text); line-height:1.65; }
-    .voice:nth-child(even) { border-color:#a5b8f2; }
-    .voice strong { display:block; margin-bottom:4px; color:var(--gold); }
-    .voice:nth-child(even) strong { color:#c6d2ff; }
-    .eyebrow { font-size:.8rem; text-transform:uppercase; letter-spacing:.13em; font-weight:700; color:var(--gold); }
-    .action { cursor:pointer; background:var(--gold); color:#27202a; padding:13px 25px; font-weight:800; font-size:1rem; border:0; border-radius:13px; transition:filter .2s,transform .2s; }
-    .action:hover { filter:brightness(1.1); transform:translateY(-2px); }
-    .action:focus-visible, .answer:focus-visible { outline:3px solid white; outline-offset:3px; }
-    .bar-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; color:var(--muted); font-size:.92rem; margin-bottom:12px; }
-    .progress { height:9px; background:#0c1424; border-radius:30px; overflow:hidden; margin-bottom:27px; }
-    .fill { height:100%; width:0; background:linear-gradient(90deg,#d99145,#f4be62); transition:width .35s; }
-    h2 { font-size:clamp(1.25rem,3vw,1.9rem); margin:8px 0 10px; }
-    .hint { color:var(--muted); margin-bottom:24px; }
-    .answers { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
-    .answer { position:relative; width:100%; text-align:left; background:var(--panel2); color:var(--text); padding:9px 9px 14px; border:2px solid #ffffff26; border-radius:17px; cursor:pointer; transition:border-color .2s,transform .2s; font:inherit; overflow:hidden; }
-    .answer:not(:disabled):hover { border-color:var(--gold); transform:translateY(-3px); }
+
+    h2 { font-family:var(--display); font-weight:400; font-size:clamp(1.7rem, 4vw, 2.35rem); line-height:1.15; margin:0 0 .35em; color:var(--bone); }
+    h2[tabindex="-1"]:focus { outline:2px solid var(--bone); outline-offset:6px; }
+    h3 { font-family:var(--display); font-weight:400; font-size:1.5rem; margin:1.4em 0 .4em; color:var(--gold); }
+    .hint { color:var(--dust); margin:0 0 1.4em; }
+
+    .dialogue { display:grid; gap:4px; margin:26px 0 34px; border-top:1px solid #e2bd7833; }
+    .voice { margin:0; padding:14px 0 14px 7.5em; position:relative; border-bottom:1px solid #e2bd7833; }
+    .voice strong { position:absolute; left:0; top:14px; font-family:var(--display); font-style:italic; font-weight:400; color:var(--pumpkin); font-size:1.15rem; }
+    .voice:nth-child(even) strong { color:var(--gold); }
+
+    .action {
+      cursor:pointer; font-family:var(--display); font-size:1.25rem; letter-spacing:.02em;
+      color:#2a1209; padding:12px 30px 13px; border:1px solid #ffcf8a; border-radius:2px;
+      background:linear-gradient(180deg, #f39a4c, #d9601f);
+      box-shadow:0 0 0 4px #e8772e26, 0 10px 26px #e8772e40;
+      transition:filter .2s, box-shadow .2s;
+    }
+    .action:hover { filter:brightness(1.08); box-shadow:0 0 0 6px #e8772e33, 0 12px 34px #e8772e66; }
+    .action:focus-visible, .answer:focus-visible { outline:2px solid var(--bone); outline-offset:4px; }
+    .center { text-align:center; }
+    /* Datos del participante y opciones de presentación. */
+    .setup { max-width:440px; margin:0 auto 26px; text-align:left; }
+    .setup label { display:block; color:var(--gold); margin-bottom:7px; }
+    .setup input[type="text"] { width:100%; min-height:48px; padding:10px 14px; border:1px solid var(--gold); border-radius:3px; color:var(--bone); background:var(--night); font:inherit; }
+    .setup input[type="text"]:focus-visible, .setup input[type="checkbox"]:focus-visible { outline:2px solid var(--pumpkin); outline-offset:3px; }
+    .setup .toggle { display:flex; align-items:center; gap:11px; margin:17px 0 4px; color:var(--bone); cursor:pointer; }
+    .setup .toggle input { accent-color:var(--pumpkin); width:20px; height:20px; flex:none; }
+    .setup small { display:block; color:var(--dust); line-height:1.3; }
+    .participant { text-align:center; color:var(--gold); margin:0 0 14px; font-style:italic; overflow-wrap:anywhere; }
+
+
+    /* ---------- Progreso: diez calabazas ---------- */
+    .bar-meta { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; font-style:italic; color:var(--dust); margin-bottom:10px; }
+    .bar-meta b { font-family:var(--display); font-weight:400; font-style:normal; color:var(--gold); font-size:1.2rem; }
+    .pumpkins { list-style:none; display:flex; gap:6px; padding:0 0 22px; margin:0 0 26px; border-bottom:1px solid #e2bd7833; }
+    .pumpkins li { flex:1; max-width:44px; }
+    .pumpkins svg { width:100%; height:auto; display:block; }
+    .pumpkins .body { fill:#3d2648; transition:fill .4s; }
+    .pumpkins .face { fill:transparent; transition:fill .4s; }
+    .pumpkins .stem { fill:#4b3a2a; }
+    .pumpkins li.done .body { fill:var(--pumpkin); }
+    .pumpkins li.done .face { fill:#ffe08f; }
+    .pumpkins li.missed .body { fill:#4a2232; }
+    .pumpkins li.current .body { fill:#3d2648; stroke:var(--gold); stroke-width:1.5; }
+
+    /* ---------- Respuestas ---------- */
+    .answers { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:20px; }
+    .answer {
+      width:100%; min-width:0; text-align:left; font:inherit; color:var(--bone); cursor:pointer;
+      background:var(--velvet-2); padding:8px 8px 14px; border:1px solid #e2bd7840; border-radius:3px;
+      transition:border-color .2s, box-shadow .2s, background .2s;
+    }
+    .answer img { display:block; width:100%; height:auto; aspect-ratio:2/1; object-fit:contain; outline:1px solid #e2bd7855; outline-offset:-5px; background:#2a1838; }
+    .answer:not(:disabled):hover { border-color:var(--pumpkin); box-shadow:0 0 0 1px var(--pumpkin), 0 0 30px #e8772e40; }
     .answer:disabled { cursor:default; }
-    .answer img { display:block; width:100%; height:175px; object-fit:cover; border-radius:10px; background:#34445e; }
-    .answer-label { display:block; margin:12px 6px 0; font-weight:730; }
-    .answer.correct { border-color:var(--green); background:#214439; }
-    .answer.incorrect { border-color:var(--red); background:#502f38; }
-    .answer.correct .answer-label::after { content:" ✓"; color:var(--green); }
-    .answer.incorrect .answer-label::after { content:" ✕"; color:var(--red); }
-    .feedback { min-height:64px; padding-top:20px; line-height:1.6; font-weight:640; }
-    .feedback.good { color:var(--green); } .feedback.bad { color:var(--red); }
-    .next-row { display:flex; justify-content:flex-end; margin-top:10px; }
-    .score { font-size:clamp(3rem,9vw,5rem); font-weight:850; color:var(--gold); margin:12px 0; }
-    .review { text-align:left; color:var(--muted); margin:24px 0; padding-left:20px; line-height:1.6; }
-    .review li { margin-bottom:10px; }
-    footer { text-align:center; color:#bcc4d1; font-size:.85rem; margin:25px 0; }
-    @media(max-width:620px) { .shell{margin:20px auto;} .answers{gap:10px;} .answer img{height:120px;} .answer-label{font-size:.85rem;} .panel{border-radius:18px;} }
-    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; } }
+    .answer-label { display:block; margin:12px 6px 0; font-size:1.12rem; line-height:1.35; }
+    .answer.correct { border-color:var(--moss); background:#26301f; box-shadow:0 0 0 1px var(--moss), 0 0 34px #7f9a5240; }
+    .answer.incorrect { border-color:var(--wine); background:#3a1724; }
+    .answer:disabled:not(.correct):not(.incorrect) { opacity:.55; }
+    .answer.correct .answer-label::after { content:"  ✓"; color:#b5d17f; }
+    .answer.incorrect .answer-label::after { content:"  ✕"; color:#e67a86; }
+
+    .feedback { min-height:72px; padding-top:22px; font-size:1.15rem; }
+    .feedback strong { font-family:var(--display); font-weight:400; font-size:1.35rem; margin-right:.3em; }
+    .feedback.good strong { color:#b5d17f; } .feedback.bad strong { color:#e67a86; }
+    .next-row { display:flex; justify-content:flex-end; margin-top:8px; }
+
+    /* ---------- Resultados ---------- */
+    #results { text-align:center; }
+    .score { font-family:var(--display); font-size:clamp(4rem, 13vw, 6.5rem); line-height:1; color:var(--pumpkin); text-shadow:0 0 40px #e8772e66; margin:.15em 0; }
+    #closing { color:var(--dust); font-style:italic; }
+    .review { text-align:left; list-style:none; padding:0; margin:0 auto 32px; max-width:36em; }
+    .review li { display:grid; grid-template-columns:1.6em 1fr; padding:10px 0; border-bottom:1px solid #e2bd7826; }
+    .review .ok { color:#b5d17f; } .review .no { color:#e67a86; }
+    .review em { color:var(--gold); }
+
+    footer { position:relative; z-index:1; text-align:center; color:var(--dust); font-style:italic; font-size:1rem; margin:30px auto 0; padding:0 16px 40px; text-shadow:0 1px 4px #000; }
+
+    @media (max-width:1300px) {
+      .qr-card { position:relative; top:auto; left:auto; margin:0 0 22px; }
+    }
+    @media (max-width:620px) {
+      body { font-size:1.08rem; }
+      .shell { padding-top:40px; }
+      .answers { gap:10px; }
+      .answer { padding:5px 5px 10px; }
+      .answer img { aspect-ratio:4/3; }
+      .answer-label { font-size:.98rem; margin:8px 4px 0; }
+      .voice { padding-left:0; padding-top:40px; }
+      .panel::before, .panel::after { width:48px; height:48px; background-size:48px; }
+    }
+    @media (max-width:430px) {
+      .intro { background:#110a1ac9; padding:8px 10px; }
+      .answers { grid-template-columns:1fr; }
+      .answer img { aspect-ratio:2/1; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *, *::before, *::after { animation:none !important; transition:none !important; }
+    }
   </style>
 </head>
 <body>
+  <div class="scene" aria-hidden="true">
+    <svg id="sceneSvg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="moonGlow"><stop offset="0" stop-color="#f6dfa8" stop-opacity=".55"/><stop offset=".45" stop-color="#e8772e" stop-opacity=".12"/><stop offset="1" stop-color="#e8772e" stop-opacity="0"/></radialGradient>
+        <radialGradient id="lantern"><stop offset="0" stop-color="#ffb347" stop-opacity=".75"/><stop offset="1" stop-color="#e8772e" stop-opacity="0"/></radialGradient>
+        <radialGradient id="eyes"><stop offset="0" stop-color="#d8f27a"/><stop offset="1" stop-color="#d8f27a" stop-opacity="0"/></radialGradient>
+        <filter id="mist" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>
+        <pattern id="fence" width="34" height="96" patternUnits="userSpaceOnUse">
+          <rect x="15" y="14" width="4" height="82" fill="#150b1c"/><path d="M17 0 L23 16 L11 16Z" fill="#150b1c"/>
+        </pattern>
+        <g id="bat"><path d="M0 6C-6-2-14-4-22 2C-26-6-36-8-46-1C-41-10-34-19-24-19C-18-14-10-12-4-8L-3-15L0-10L3-15L4-8C10-12 18-14 24-19C34-19 41-10 46-1C36-8 26-6 22 2C14-4 6-2 0 6Z"/></g>
+        <g id="pumpkin">
+          <circle r="120" fill="url(#lantern)" class="flicker"/>
+          <ellipse cx="-30" cy="0" rx="40" ry="44" fill="#b24c19"/><ellipse cx="30" cy="0" rx="40" ry="44" fill="#b24c19"/>
+          <ellipse cx="0" cy="0" rx="40" ry="47" fill="#d9661f"/>
+          <path d="M-4-46 Q-2-62 8-68 L12-62 Q4-56 5-45Z" fill="#3e4a22"/>
+          <g fill="#ffd36b" class="flicker"><path d="M-36-12 L-18-26 L-12-6Z M36-12 L18-26 L12-6Z M-6 0 L0-10 L6 0Z"/>
+          <path d="M-40 12 Q0 40 40 12 L32 24 L24 18 L16 30 L6 22 L-4 32 L-14 22 L-24 30 L-30 20 L-36 24Z"/></g>
+        </g>
+      </defs>
+
+      <!-- Luna -->
+      <circle cx="1270" cy="190" r="300" fill="url(#moonGlow)"/>
+      <circle cx="1270" cy="190" r="96" fill="#f1dfb0"/>
+      <circle cx="1240" cy="168" r="17" fill="#e2cb92"/><circle cx="1298" cy="222" r="11" fill="#e2cb92"/><circle cx="1300" cy="160" r="7" fill="#e2cb92"/>
+
+      <!-- Telaraña -->
+      <g stroke="#efe6d4" stroke-opacity=".16" fill="none" stroke-width="1.2">
+        <path d="M0 0 L250 40 M0 0 L210 130 M0 0 L130 210 M0 0 L40 250"/>
+        <path d="M60 10 Q52 30 51 33 Q38 45 32 52 Q30 55 10 60"/>
+        <path d="M120 19 Q110 52 103 66 Q82 88 64 103 Q50 112 19 120"/>
+        <path d="M185 30 Q168 78 155 100 Q125 135 97 157 Q70 172 30 185"/>
+      </g>
+
+      <!-- Murciélagos -->
+      <g class="bats" fill="#0b0610">
+        <use href="#bat" transform="translate(1210 150) scale(1.1)"/>
+        <use href="#bat" transform="translate(1335 236) scale(.7) rotate(-8)"/>
+        <use href="#bat" transform="translate(1080 90) scale(.6) rotate(10)"/>
+        <use href="#bat" transform="translate(1460 120) scale(.5)"/>
+        <use href="#bat" transform="translate(360 150) scale(.55) rotate(-12)"/>
+        <use href="#bat" transform="translate(470 92) scale(.4) rotate(6)"/>
+      </g>
+
+      <!-- Colinas lejanas y casa embrujada -->
+      <path d="M0 690 Q220 610 430 650 T880 628 T1320 640 T1600 600 V900 H0Z" fill="#2a1533"/>
+      <g fill="#20102a">
+        <path d="M1050 640 V560 L1090 520 L1130 560 V640Z"/><path d="M1130 640 V585 H1210 V640Z"/><path d="M1122 590 L1170 548 L1218 590Z"/>
+        <rect x="1080" y="490" width="12" height="40"/><path d="M1078 492 L1086 470 L1094 492Z"/>
+      </g>
+      <g fill="#ffb347" opacity=".85" class="flicker"><rect x="1080" y="570" width="10" height="14"/><rect x="1150" y="600" width="10" height="12"/><rect x="1180" y="600" width="10" height="12"/></g>
+
+      <!-- Árbol retorcido -->
+      <g fill="#0e0713">
+        <path d="M120 820 C140 720 146 630 124 545 C104 470 64 444 18 432 C70 430 106 455 126 492 C127 432 110 382 66 340 C122 360 148 422 150 482 C162 420 194 380 246 358 C204 400 178 452 170 522 C204 482 254 470 306 482 C254 492 204 522 180 584 C174 656 184 740 214 820Z"/>
+        <path d="M66 340 L44 300 M44 300 L20 296 M44 300 L50 270 M246 358 L270 330 M270 330 L300 328 M306 482 L336 470 M18 432 L-4 420" stroke="#0e0713" stroke-width="6" stroke-linecap="round"/>
+      </g>
+
+      <!-- Verja -->
+      <rect x="0" y="716" width="1600" height="96" fill="url(#fence)"/>
+      <rect x="0" y="740" width="1600" height="5" fill="#150b1c"/><rect x="0" y="790" width="1600" height="5" fill="#150b1c"/>
+
+      <!-- Suelo cercano -->
+      <path d="M0 800 Q300 772 620 798 T1220 788 T1600 776 V900 H0Z" fill="#0e0713"/>
+
+      <!-- Lápidas -->
+      <g fill="#1d1126" stroke="#3b2648" stroke-width="2">
+        <path d="M560 812 V746 Q560 712 594 712 Q628 712 628 746 V812Z"/>
+        <path d="M680 816 V770 H700 V740 H716 V770 H736 V786 H716 V816Z"/>
+        <path d="M1180 808 V752 Q1180 726 1206 726 Q1232 726 1232 752 V808Z"/>
+        <path d="M1046 812 V764 H1098 V812Z"/>
+      </g>
+      <g stroke="#3b2648" stroke-width="3"><path d="M584 742 H604 M594 732 V770"/><path d="M1196 760 H1216 M1206 750 V786"/></g>
+
+      <!-- Mano de zombi saliendo de la tumba -->
+      <g transform="translate(-470 0)"><path d="M760 830 Q790 812 830 830Z" fill="#170c1d"/>
+      <path d="M786 820 L780 770 L774 750 L780 748 L788 768 L788 744 L795 742 L797 766 L802 746 L809 748 L806 770 L814 756 L820 760 L808 786 L806 820Z" fill="#0b0610"/></g>
+
+      <!-- Zombi -->
+      <g transform="translate(1930 0) scale(-1 1)">
+      <g fill="#0b0610" stroke="#0b0610" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="404" cy="604" r="26" transform="rotate(14 404 604)"/>
+        <path d="M378 632 L432 628 L446 720 L436 714 L426 726 L414 712 L402 728 L390 714 L378 724Z"/>
+        <path d="M424 646 L486 636 L500 628" stroke-width="17" fill="none"/>
+        <path d="M418 664 L478 668 L494 662" stroke-width="15" fill="none"/>
+        <path d="M498 628 l14 -8 M500 630 l16 -2 M498 632 l14 6 M492 662 l14 -6 M494 664 l14 4" stroke-width="5"/>
+        <path d="M398 716 L390 760 L396 808" stroke-width="20" fill="none"/>
+        <path d="M428 716 L446 760 L430 812" stroke-width="20" fill="none"/>
+        <path d="M384 810 h26 M420 814 h28" stroke-width="10"/>
+      </g>
+      <circle cx="410" cy="598" r="9" fill="url(#eyes)"/><circle cx="426" cy="603" r="8" fill="url(#eyes)"/>
+      <circle cx="410" cy="598" r="2.6" fill="#e9ff9a"/><circle cx="426" cy="603" r="2.4" fill="#e9ff9a"/>
+      </g>
+
+      <!-- Calabazas -->
+      <use href="#pumpkin" transform="translate(1290 824) scale(1.05)"/>
+      <use href="#pumpkin" transform="translate(1186 856) scale(.58)"/>
+      <use href="#pumpkin" transform="translate(1560 862) scale(.6)"/>
+      <use href="#pumpkin" transform="translate(150 852) scale(.66)"/>
+
+      <!-- Niebla -->
+      <g filter="url(#mist)" fill="#cdb8e0" opacity=".1">
+        <ellipse cx="300" cy="820" rx="360" ry="40"/><ellipse cx="900" cy="830" rx="420" ry="34"/><ellipse cx="1450" cy="810" rx="300" ry="36"/>
+      </g>
+    </svg>
+  </div>
+
   <main class="shell">
-    <div class="topline">Filipino traditions · Ready to Practice English?</div>
-    <h1>Pangangaluluwa: Songs for the Souls</h1>
-    <p class="intro">In some places in the Philippines, people visit homes and sing special songs. They remember people who have died. Learn about Pangangaluluwa with ten picture questions.</p>
+    <a class="qr-card" href="qr_pangangaluluwa.png" target="_blank" rel="noopener" aria-label="Open the Pangangaluluwa QR code at full size">
+      <img src="qr_pangangaluluwa.png" alt="" width="1080" height="1080" />
+      <span>Scan or open QR code</span>
+    </a>
+    <header>
+      <p class="kicker">An easy English picture quiz</p>
+      <h1>Pangangaluluwa <span>Songs for the Souls</span></h1>
+      <svg class="divider" viewBox="0 0 340 24" aria-hidden="true">
+        <path d="M0 12 H130 M210 12 H340" stroke="#e2bd78" stroke-width="1"/>
+        <path d="M30 16 H120 M220 16 H310" stroke="#e2bd78" stroke-width=".5" opacity=".6"/>
+        <path fill="#e8772e" transform="translate(170 14) scale(.8)" d="M0 6C-6-2-14-4-22 2C-26-6-36-8-46-1C-41-10-34-19-24-19C-18-14-10-12-4-8L-3-15L0-10L3-15L4-8C10-12 18-14 24-19C34-19 41-10 46-1C36-8 26-6 22 2C14-4 6-2 0 6Z"/>
+      </svg>
+      <p class="intro">In some places in the Philippines, people visit homes and sing special songs. They remember people who have died. Learn about Pangangaluluwa with ten picture questions.</p>
+    </header>
 
     <section class="panel" id="welcome">
-      <span class="eyebrow">Listen and learn</span>
       <h2>A special Filipino tradition</h2>
-      <p class="hint">Read each question. Choose one of four pictures. You will see if your answer is right. Each correct answer gives you one point.</p>
+      <p class="hint">Read each question and choose one of four pictures. You will see if your answer is right. Each correct answer lights one pumpkin.</p>
       <div class="dialogue" aria-label="Short story with two voices">
-        <p class="voice"><strong>Voice 1</strong> Welcome! Today we will learn about Pangangaluluwa. It is an old tradition in the Philippines.</p>
-        <p class="voice"><strong>Voice 2</strong> Some people dress like spirits. They walk from house to house. They sing special songs.</p>
-        <p class="voice"><strong>Voice 1</strong> The songs ask for prayers for the dead. Families may give food or a little money.</p>
-        <p class="voice"><strong>Voice 2</strong> This is a time to remember people we love. Are you ready? Let us play!</p>
+        <p class="voice"><strong>Voice 1</strong> Welcome! Pangangaluluwa is a tradition in some communities in the Philippines. People remember family and friends who have died.</p>
+        <p class="voice"><strong>Voice 2</strong> It takes place around the end of October and the start of November. Groups walk from house to house. Some visitors wear white clothes or white sheets.</p>
+        <p class="voice"><strong>Voice 1</strong> They act as souls of people who have died. Some people believe a soul is the part of a person that lives after death.</p>
+        <p class="voice"><strong>Voice 2</strong> The visitors sing special songs outside homes. The songs ask families to say prayers for the souls. Prayers are words people say to God.</p>
+        <p class="voice"><strong>Voice 1</strong> Families listen to the songs. They may give the visitors food or a little money. Sometimes they give rice cakes, a traditional Filipino food.</p>
+        <p class="voice"><strong>Voice 2</strong> Families remember people who have died. This tradition brings people together. Some communities keep it so young people can learn about it. Are you ready? Let us play!</p>
       </div>
-      <button class="action" id="start" type="button">Start the quiz →</button>
+      <form id="startForm">
+        <div class="setup">
+          <label for="participantName">Your name</label>
+          <input id="participantName" name="participantName" type="text" autocomplete="name" maxlength="80" placeholder="Write your name" required />
+          <small>Each player gets 10 questions from a set of 20, one from each topic. The questions and four pictures are shuffled.</small>
+        </div>
+        <div class="center"><button class="action" id="start" type="submit">Start the quiz</button></div>
+      </form>
     </section>
 
-    <section class="panel hidden" id="quiz" aria-live="polite">
-      <div class="bar-meta"><span id="counter">Question 1 of 10</span><span id="scoreLive">Score: 0</span></div>
-      <div class="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progress"><div class="fill" id="fill"></div></div>
-      <span class="eyebrow">Choose the correct picture</span>
-      <h2 id="question"></h2>
-      <p class="hint" id="helpText">Only one answer is correct.</p>
+    <section class="panel hidden" id="quiz">
+      <p class="participant" id="participantQuiz"></p>
+      <div class="bar-meta"><span id="counter">Question 1 of 10</span><span>Score <b id="scoreLive">0</b></span></div>
+      <ol class="pumpkins" id="pumpkins" aria-label="Your answers so far"></ol>
+      <h2 id="question" tabindex="-1"></h2>
+      <p class="hint" id="helpText">Choose one picture. Only one answer is correct.</p>
       <div class="answers" id="answers"></div>
-      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
-      <div class="next-row"><button type="button" class="action hidden" id="next">Next question →</button></div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div class="next-row"><button type="button" class="action hidden" id="next">Next question</button></div>
     </section>
 
-    <section class="panel hidden" id="results" aria-live="polite">
-      <span class="eyebrow">Quiz complete</span>
-      <h2>Well done!</h2>
+    <section class="panel hidden" id="results">
+      <h2 id="resultsTitle" tabindex="-1">Well done!</h2>
+      <p class="participant" id="participantResult"></p>
       <div class="score" id="finalScore"></div>
       <p id="closing"></p>
       <h3>Look at the answers</h3>
       <ol class="review" id="review"></ol>
-      <button class="action" type="button" id="restart">Play again ↻</button>
+      <button class="action" type="button" id="restart">Play again</button>
     </section>
-    <footer>An English learning activity about a Filipino tradition. Customs can be different in different places.</footer>
   </main>
+  <footer>An English learning activity about a Filipino tradition. Customs can be different in different places.</footer>
 
   <script>
     "use strict";
 
     // =============================================================
-    // 1. PERSONALIZACIÓN: modifica SOLO este array para cambiar el quiz.
+    // 1. BANCO DE 20 PREGUNTAS: edita este array para cambiar el quiz.
+    //    En cada intento se selecciona una pregunta al azar de cada tema.
     // Cada pregunta contiene:
     // - pregunta: texto mostrado.
-    // - opciones: EXACTAMENTE cuatro objetos { texto, imagen, emoji }.
+    // - categoria: uno de los diez temas del cuestionario.
+    // - opciones: EXACTAMENTE cuatro objetos { texto, imagen, dibujo }.
     //   imagen: URL o ruta, p. ej. "imagenes/almas.jpg". Si está vacío,
-    //   aparece una ilustración SVG generada a partir de emoji y texto.
+    //   se usa la ilustración SVG indicada en "dibujo" (ver bloque 2).
     // - correcta: índice de la opción verdadera, empezando en 0 (0,1,2,3).
     // - explicacion: mensaje que aparece después de responder.
     // =============================================================
     const preguntas = [
+  {
+    "pregunta": "In the story, what do some visitors wear?",
+    "categoria": "clothing",
+    "opciones": [
       {
-        pregunta: "What do some people wear?",
-        opciones: [
-          { texto:"Costumes like movie vampires", imagen:"", emoji:"🧛" },
-          { texto:"White sheets like spirits", imagen:"", emoji:"👻" },
-          { texto:"Clothes like old soldiers", imagen:"", emoji:"⚔️" },
-          { texto:"Bright clothes for a parade", imagen:"", emoji:"🎭" }
-        ], correcta:1,
-        explicacion:"Some people wear white or dark sheets. They look like spirits."
+        "texto": "Dark capes",
+        "imagen": "",
+        "dibujo": "vampiro"
       },
       {
-        pregunta:"What do people do at houses?",
-        opciones:[
-          { texto:"They play ball games", imagen:"", emoji:"🏀" },
-          { texto:"They drive big cars", imagen:"", emoji:"🚗" },
-          { texto:"They sing special songs", imagen:"", emoji:"🎶" },
-          { texto:"They fly colorful kites", imagen:"", emoji:"🪁" }
-        ], correcta:2,
-        explicacion:"People go from house to house. They sing special songs."
+        "texto": "White sheets",
+        "imagen": "",
+        "dibujo": "sabanas"
       },
       {
-        pregunta:"Who do the singers represent?",
-        opciones:[
-          { texto:"Souls who need prayers", imagen:"", emoji:"🕯️" },
-          { texto:"Kings from an old castle", imagen:"", emoji:"👑" },
-          { texto:"Pirates on the sea", imagen:"", emoji:"🏴‍☠️" },
-          { texto:"People who travel in space", imagen:"", emoji:"🚀" }
-        ], correcta:0,
-        explicacion:"The singers act like souls. The songs ask people to pray for them."
+        "texto": "Green uniforms",
+        "imagen": "",
+        "dibujo": "soldados"
       },
       {
-        pregunta:"What can families give the singers?",
-        opciones:[
-          { texto:"New balls for games", imagen:"", emoji:"⚽" },
-          { texto:"Tools to build houses", imagen:"", emoji:"🧰" },
-          { texto:"Tickets to watch movies", imagen:"", emoji:"🎟️" },
-          { texto:"Food or a little money", imagen:"", emoji:"🍚" }
-        ], correcta:3,
-        explicacion:"Families may give food or a little money. Each town has its own customs."
-      },
-      {
-        pregunta:"When does Pangangaluluwa take place?",
-        opciones:[
-          { texto:"Around All Saints’ Day", imagen:"", emoji:"🕯️" },
-          { texto:"On Valentine’s Day in February", imagen:"", emoji:"💝" },
-          { texto:"On New Year’s Day", imagen:"", emoji:"🎆" },
-          { texto:"During the summer school break", imagen:"", emoji:"🏖️" }
-        ], correcta:0,
-        explicacion:"People usually do this around October 31 and November 1. Dates can change by town."
-      },
-      {
-        pregunta:"Where is Pangangaluluwa from?",
-        opciones:[
-          { texto:"It comes from Italy", imagen:"", emoji:"🇮🇹" },
-          { texto:"It comes from the Philippines", imagen:"", emoji:"🇵🇭" },
-          { texto:"It comes from Canada", imagen:"", emoji:"🇨🇦" },
-          { texto:"It comes from India", imagen:"", emoji:"🇮🇳" }
-        ], correcta:1,
-        explicacion:"Pangangaluluwa is a tradition in the Philippines."
-      },
-      {
-        pregunta:"What food can families give?",
-        opciones:[
-          { texto:"A large cheese pizza", imagen:"", emoji:"🍕" },
-          { texto:"A big beef burger", imagen:"", emoji:"🍔" },
-          { texto:"Suman, a Filipino rice cake", imagen:"", emoji:"🍙" },
-          { texto:"A bowl of spaghetti", imagen:"", emoji:"🍝" }
-        ], correcta:2,
-        explicacion:"Suman is a Filipino rice cake. It is one kind of kakanin."
-      },
-      {
-        pregunta:"What do people do for the dead?",
-        opciones:[
-          { texto:"They make loud fireworks", imagen:"", emoji:"🎇" },
-          { texto:"They run in races", imagen:"", emoji:"🏁" },
-          { texto:"They buy many gifts", imagen:"", emoji:"🎁" },
-          { texto:"They say prayers for them", imagen:"", emoji:"🙏" }
-        ], correcta:3,
-        explicacion:"People pray for those who have died. Prayer is important in this tradition."
-      },
-      {
-        pregunta:"What can this tradition teach us?",
-        opciones:[
-          { texto:"Remember and help other people", imagen:"", emoji:"🤝" },
-          { texto:"Try to make more money", imagen:"", emoji:"💰" },
-          { texto:"Stay away from all people", imagen:"", emoji:"🚪" },
-          { texto:"Buy new phones every year", imagen:"", emoji:"📱" }
-        ], correcta:0,
-        explicacion:"People sing, share food, and remember the dead together."
-      },
-      {
-        pregunta:"What is special about Pangangaluluwa?",
-        opciones:[
-          { texto:"Buying many new toys", imagen:"", emoji:"🧸" },
-          { texto:"Prayers for people who died", imagen:"", emoji:"🕊️" },
-          { texto:"Watching many scary movies", imagen:"", emoji:"🎬" },
-          { texto:"Playing video games for prizes", imagen:"", emoji:"🎮" }
-        ], correcta:1,
-        explicacion:"Like Halloween, people may wear costumes. But prayers and memory are important here."
+        "texto": "Bright costumes",
+        "imagen": "",
+        "dibujo": "desfile"
       }
-    ];
+    ],
+    "correcta": 1,
+    "explicacion": "Some visitors wear white clothes or white sheets."
+  },
+  {
+    "pregunta": "In the story, what do visitors do outside homes?",
+    "categoria": "songs",
+    "opciones": [
+      {
+        "texto": "Knock on doors",
+        "imagen": "",
+        "dibujo": "llamarPuerta"
+      },
+      {
+        "texto": "Light candles",
+        "imagen": "",
+        "dibujo": "encenderVelas"
+      },
+      {
+        "texto": "Sing songs",
+        "imagen": "",
+        "dibujo": "cantar"
+      },
+      {
+        "texto": "Leave flowers",
+        "imagen": "",
+        "dibujo": "dejarFlores"
+      }
+    ],
+    "correcta": 2,
+    "explicacion": "The visitors sing special songs outside homes."
+  },
+  {
+    "pregunta": "Who do the visitors act as?",
+    "categoria": "souls and memory",
+    "opciones": [
+      {
+        "texto": "Souls of the dead",
+        "imagen": "",
+        "dibujo": "almas"
+      },
+      {
+        "texto": "Children at school",
+        "imagen": "",
+        "dibujo": "escuela"
+      },
+      {
+        "texto": "Workers in town",
+        "imagen": "",
+        "dibujo": "trabajo"
+      },
+      {
+        "texto": "Family at home",
+        "imagen": "",
+        "dibujo": "familia"
+      }
+    ],
+    "correcta": 0,
+    "explicacion": "The visitors act as souls of people who have died."
+  },
+  {
+    "pregunta": "In the story, what may families give visitors?",
+    "categoria": "gifts",
+    "opciones": [
+      {
+        "texto": "Flowers or candles",
+        "imagen": "",
+        "dibujo": "floresVelas"
+      },
+      {
+        "texto": "Clothes or shoes",
+        "imagen": "",
+        "dibujo": "ropaZapatos"
+      },
+      {
+        "texto": "Letters or cards",
+        "imagen": "",
+        "dibujo": "cartas"
+      },
+      {
+        "texto": "Food or money",
+        "imagen": "",
+        "dibujo": "comidaDinero"
+      }
+    ],
+    "correcta": 3,
+    "explicacion": "Families may give food or a little money."
+  },
+  {
+    "pregunta": "Around which months does this happen?",
+    "categoria": "date",
+    "opciones": [
+      {
+        "texto": "October and November",
+        "imagen": "",
+        "dibujo": "fechasOctNov"
+      },
+      {
+        "texto": "November and December",
+        "imagen": "",
+        "dibujo": "fechasNovDic"
+      },
+      {
+        "texto": "December and January",
+        "imagen": "",
+        "dibujo": "fechasDicEne"
+      },
+      {
+        "texto": "January and February",
+        "imagen": "",
+        "dibujo": "fechasEneFeb"
+      }
+    ],
+    "correcta": 0,
+    "explicacion": "In some communities, it takes place around the end of October and the start of November."
+  },
+  {
+    "pregunta": "Where is Pangangaluluwa from?",
+    "categoria": "country",
+    "opciones": [
+      {
+        "texto": "Italy",
+        "imagen": "",
+        "dibujo": "italia"
+      },
+      {
+        "texto": "The Philippines",
+        "imagen": "",
+        "dibujo": "filipinas"
+      },
+      {
+        "texto": "Canada",
+        "imagen": "",
+        "dibujo": "canada"
+      },
+      {
+        "texto": "India",
+        "imagen": "",
+        "dibujo": "india"
+      }
+    ],
+    "correcta": 1,
+    "explicacion": "Pangangaluluwa is a tradition in the Philippines."
+  },
+  {
+    "pregunta": "What traditional food does the story name?",
+    "categoria": "food",
+    "opciones": [
+      {
+        "texto": "Fresh fruit",
+        "imagen": "",
+        "dibujo": "fruta"
+      },
+      {
+        "texto": "Sweet bread",
+        "imagen": "",
+        "dibujo": "pan"
+      },
+      {
+        "texto": "Rice cakes",
+        "imagen": "",
+        "dibujo": "suman"
+      },
+      {
+        "texto": "Warm soup",
+        "imagen": "",
+        "dibujo": "sopa"
+      }
+    ],
+    "correcta": 2,
+    "explicacion": "Families may give rice cakes, a traditional Filipino food."
+  },
+  {
+    "pregunta": "What do the songs ask families to say?",
+    "categoria": "prayer",
+    "opciones": [
+      {
+        "texto": "A story",
+        "imagen": "",
+        "dibujo": "cuento"
+      },
+      {
+        "texto": "A greeting",
+        "imagen": "",
+        "dibujo": "saludar"
+      },
+      {
+        "texto": "A name",
+        "imagen": "",
+        "dibujo": "nombre"
+      },
+      {
+        "texto": "A prayer",
+        "imagen": "",
+        "dibujo": "rezar"
+      }
+    ],
+    "correcta": 3,
+    "explicacion": "The songs ask families to say prayers for the souls."
+  },
+  {
+    "pregunta": "In the story, what do families do when visitors sing?",
+    "categoria": "community",
+    "opciones": [
+      {
+        "texto": "Listen to songs",
+        "imagen": "",
+        "dibujo": "escuchar"
+      },
+      {
+        "texto": "Walk to houses",
+        "imagen": "",
+        "dibujo": "hogares"
+      },
+      {
+        "texto": "Cook rice cakes",
+        "imagen": "",
+        "dibujo": "cocinar"
+      },
+      {
+        "texto": "Write letters",
+        "imagen": "",
+        "dibujo": "cartas"
+      }
+    ],
+    "correcta": 0,
+    "explicacion": "Families listen to the songs. They may give food or money after that."
+  },
+  {
+    "pregunta": "In the story, what is a prayer?",
+    "categoria": "prayer",
+    "opciones": [
+      {
+        "texto": "Words to a friend",
+        "imagen": "",
+        "dibujo": "saludar"
+      },
+      {
+        "texto": "Words said to God",
+        "imagen": "",
+        "dibujo": "rezar"
+      },
+      {
+        "texto": "Words in a letter",
+        "imagen": "",
+        "dibujo": "cartas"
+      },
+      {
+        "texto": "Words in a story",
+        "imagen": "",
+        "dibujo": "cuento"
+      }
+    ],
+    "correcta": 1,
+    "explicacion": "In the story, prayers are words people say to God."
+  },
+  {
+    "pregunta": "What do the songs ask for?",
+    "categoria": "prayer",
+    "opciones": [
+      {
+        "texto": "Stories for children",
+        "imagen": "",
+        "dibujo": "cuento"
+      },
+      {
+        "texto": "Flowers for homes",
+        "imagen": "",
+        "dibujo": "dejarFlores"
+      },
+      {
+        "texto": "Prayers for souls",
+        "imagen": "",
+        "dibujo": "rezar"
+      },
+      {
+        "texto": "Candles for families",
+        "imagen": "",
+        "dibujo": "encenderVelas"
+      }
+    ],
+    "correcta": 2,
+    "explicacion": "The songs ask families to say prayers for the souls."
+  },
+  {
+    "pregunta": "In the story, where do the singers go?",
+    "categoria": "visits",
+    "opciones": [
+      {
+        "texto": "From school to school",
+        "imagen": "",
+        "dibujo": "escuelas"
+      },
+      {
+        "texto": "From shop to shop",
+        "imagen": "",
+        "dibujo": "tiendas"
+      },
+      {
+        "texto": "From farm to farm",
+        "imagen": "",
+        "dibujo": "granjas"
+      },
+      {
+        "texto": "From house to house",
+        "imagen": "",
+        "dibujo": "hogares"
+      }
+    ],
+    "correcta": 3,
+    "explicacion": "The visitors walk from house to house."
+  },
+  {
+    "pregunta": "In the story, who do families remember?",
+    "categoria": "souls and memory",
+    "opciones": [
+      {
+        "texto": "People at school",
+        "imagen": "",
+        "dibujo": "escuela"
+      },
+      {
+        "texto": "People who have died",
+        "imagen": "",
+        "dibujo": "recuerdo"
+      },
+      {
+        "texto": "People at work",
+        "imagen": "",
+        "dibujo": "trabajo"
+      },
+      {
+        "texto": "People at home",
+        "imagen": "",
+        "dibujo": "familia"
+      }
+    ],
+    "correcta": 1,
+    "explicacion": "Families remember family and friends who have died."
+  },
+  {
+    "pregunta": "Which food may families give in the story?",
+    "categoria": "food",
+    "opciones": [
+      {
+        "texto": "Rice cakes",
+        "imagen": "",
+        "dibujo": "suman"
+      },
+      {
+        "texto": "Fresh fruit",
+        "imagen": "",
+        "dibujo": "fruta"
+      },
+      {
+        "texto": "Sweet bread",
+        "imagen": "",
+        "dibujo": "pan"
+      },
+      {
+        "texto": "Warm soup",
+        "imagen": "",
+        "dibujo": "sopa"
+      }
+    ],
+    "correcta": 0,
+    "explicacion": "Some families may give rice cakes."
+  },
+  {
+    "pregunta": "In the story, what do visitors do outside each home?",
+    "categoria": "songs",
+    "opciones": [
+      {
+        "texto": "Tell stories",
+        "imagen": "",
+        "dibujo": "cuento"
+      },
+      {
+        "texto": "Light candles",
+        "imagen": "",
+        "dibujo": "encenderVelas"
+      },
+      {
+        "texto": "Knock on doors",
+        "imagen": "",
+        "dibujo": "llamarPuerta"
+      },
+      {
+        "texto": "Sing songs",
+        "imagen": "",
+        "dibujo": "cantar"
+      }
+    ],
+    "correcta": 3,
+    "explicacion": "The visitors sing special songs outside homes."
+  },
+  {
+    "pregunta": "What do visitors ask families to say?",
+    "categoria": "prayer",
+    "opciones": [
+      {
+        "texto": "A greeting",
+        "imagen": "",
+        "dibujo": "saludar"
+      },
+      {
+        "texto": "A story",
+        "imagen": "",
+        "dibujo": "cuento"
+      },
+      {
+        "texto": "A prayer",
+        "imagen": "",
+        "dibujo": "rezar"
+      },
+      {
+        "texto": "A name",
+        "imagen": "",
+        "dibujo": "nombre"
+      }
+    ],
+    "correcta": 2,
+    "explicacion": "The visitors ask families to say prayers for the souls."
+  },
+  {
+    "pregunta": "Which country has this tradition?",
+    "categoria": "country",
+    "opciones": [
+      {
+        "texto": "India",
+        "imagen": "",
+        "dibujo": "india"
+      },
+      {
+        "texto": "Canada",
+        "imagen": "",
+        "dibujo": "canada"
+      },
+      {
+        "texto": "Italy",
+        "imagen": "",
+        "dibujo": "italia"
+      },
+      {
+        "texto": "The Philippines",
+        "imagen": "",
+        "dibujo": "filipinas"
+      }
+    ],
+    "correcta": 3,
+    "explicacion": "Pangangaluluwa is a Filipino tradition."
+  },
+  {
+    "pregunta": "In the story, how may families help after the songs?",
+    "categoria": "community",
+    "opciones": [
+      {
+        "texto": "Tell stories",
+        "imagen": "",
+        "dibujo": "cuento"
+      },
+      {
+        "texto": "Leave flowers",
+        "imagen": "",
+        "dibujo": "dejarFlores"
+      },
+      {
+        "texto": "Share food",
+        "imagen": "",
+        "dibujo": "ayudar"
+      },
+      {
+        "texto": "Light candles",
+        "imagen": "",
+        "dibujo": "encenderVelas"
+      }
+    ],
+    "correcta": 2,
+    "explicacion": "Families may share food with the visitors after the songs."
+  },
+  {
+    "pregunta": "In the story, what may families give instead of food?",
+    "categoria": "gifts",
+    "opciones": [
+      {
+        "texto": "Flowers",
+        "imagen": "",
+        "dibujo": "dejarFlores"
+      },
+      {
+        "texto": "Money",
+        "imagen": "",
+        "dibujo": "dinero"
+      },
+      {
+        "texto": "Candles",
+        "imagen": "",
+        "dibujo": "encenderVelas"
+      },
+      {
+        "texto": "Letters",
+        "imagen": "",
+        "dibujo": "cartas"
+      }
+    ],
+    "correcta": 1,
+    "explicacion": "Families may give the visitors a little money instead of food."
+  },
+  {
+    "pregunta": "According to the story, why do some communities keep this tradition?",
+    "categoria": "community",
+    "opciones": [
+      {
+        "texto": "To teach young people",
+        "imagen": "",
+        "dibujo": "ensenar"
+      },
+      {
+        "texto": "To earn more money",
+        "imagen": "",
+        "dibujo": "vender"
+      },
+      {
+        "texto": "To visit more homes",
+        "imagen": "",
+        "dibujo": "hogares"
+      },
+      {
+        "texto": "To meet new people",
+        "imagen": "",
+        "dibujo": "saludar"
+      }
+    ],
+    "correcta": 0,
+    "explicacion": "Some communities want young people to learn about the tradition."
+  }
+];
 
     // =============================================================
-    // 2. GENERACIÓN DE IMÁGENES: ilustraciones SVG integradas.
-    // Puedes sustituirlas por fotografías simplemente rellenando "imagen".
-    // El escape evita interpretar los textos de opciones como código HTML.
+    // 2. ILUSTRACIONES: dibujos SVG propios, en un mismo estilo.
+    // Cada opción usa "dibujo" (una clave de este objeto). Si rellenas
+    // "imagen" con una URL o ruta, esa foto se usa en su lugar.
+    // Los motivos quedan en el centro para que no se recorten en móvil.
     // =============================================================
-    const escapar = texto => String(texto).replace(/[&<>"']/g, caracter =>
-      ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[caracter]
-    );
-    function ilustracion(opcion, indice) {
-      const paletas = [["#56416b","#29354d"],["#525e77","#273d4a"],["#76534d","#49364e"],["#475d58","#293d44"]];
-      const [inicio, fin] = paletas[indice % paletas.length];
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="340" viewBox="0 0 640 340">
-        <defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${inicio}"/><stop offset="1" stop-color="${fin}"/></linearGradient></defs>
-        <rect width="640" height="340" fill="url(#g)"/>
-        <circle cx="548" cy="64" r="67" fill="#f4be62" opacity=".13"/>
-        <circle cx="94" cy="285" r="115" fill="#fff" opacity=".06"/>
-        <text x="320" y="207" text-anchor="middle" font-size="126" font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">${escapar(opcion.emoji || "🕯️")}</text>
+    const FONT = "font-family='Arial,Helvetica,sans-serif'";
+    const fondos = [["#3f2556","#190f25"],["#2e2a52","#141026"],["#542636","#1d0f1c"],["#29403f","#10191c"]];
+    const DIA = ["#86c3ea","#d8eef8"];
+    const ESTRELLAS = [[60,40],[130,90],[205,30],[455,38],[590,110],[560,30],[35,140],[600,190],[300,24],[390,60]]
+      .map(([x,y],k) => `<circle cx="${x}" cy="${y}" r="${k%3?1.6:2.4}" fill="#fff" opacity=".7"/>`).join("");
+
+    function escena(cuerpo, i, op = {}) {
+      const [a, b] = op.cielo || fondos[i % fondos.length];
+      const noche = !op.cielo;
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+        <defs>
+          <linearGradient id="cielo" x2="0" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>
+          <radialGradient id="luz"><stop stop-color="#ffd98a" stop-opacity=".95"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+          <linearGradient id="onda" x2="1"><stop stop-color="#fff" stop-opacity=".18"/><stop offset=".3" stop-color="#000" stop-opacity=".12"/><stop offset=".6" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity=".15"/></linearGradient>
+        </defs>
+        <rect width="640" height="320" fill="url(#cielo)"/>
+        ${noche && op.estrellas !== false ? ESTRELLAS : ""}
+        ${op.luna ? luna(op.luna[0], op.luna[1]) : ""}
+        ${op.suelo === false ? "" : `<path d="M0 272 Q160 252 320 264 T640 260 V320 H0Z" fill="${op.suelo || "#0000002e"}"/>`}
+        ${cuerpo}
       </svg>`;
+    }
+    const luna = (x, y) => `<circle cx="${x}" cy="${y}" r="70" fill="url(#luz)" opacity=".35"/><circle cx="${x}" cy="${y}" r="30" fill="#f8e2a8"/><circle cx="${x-9}" cy="${y-6}" r="6" fill="#e9cf8d"/><circle cx="${x+10}" cy="${y+9}" r="4" fill="#e9cf8d"/>`;
+    const brillo = (x, y, r = 40, o = .7) => `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#luz)" opacity="${o}"/>`;
+    const vela = (x, y, h = 46) => `${brillo(x, y-h-12, 34, .75)}
+      <rect x="${x-9}" y="${y-h}" width="18" height="${h}" rx="3" fill="#f6efe0"/><rect x="${x-9}" y="${y-h}" width="6" height="${h}" rx="3" fill="#fff" opacity=".6"/>
+      <path d="M${x} ${y-h-24} Q${x+9} ${y-h-9} ${x} ${y-h-2} Q${x-9} ${y-h-9} ${x} ${y-h-24}Z" fill="#ffc94d"/><path d="M${x} ${y-h-14} Q${x+4} ${y-h-7} ${x} ${y-h-3} Q${x-4} ${y-h-7} ${x} ${y-h-14}Z" fill="#fff4d0"/>`;
+    const fantasma = (x, y, s = 1, op = 1) => `<g transform="translate(${x} ${y}) scale(${s})" opacity="${op}">
+      <path d="M-44 0 V-72 Q-44 -128 0 -128 Q44 -128 44 -72 V0 Q33 -11 22 0 Q11 11 0 0 Q-11 -11 -22 0 Q-33 11 -44 0Z" fill="#eef1f7"/>
+      <path d="M18 -124 Q44 -112 44 -72 V0 Q38 -6 30 -4 Q34 -60 18 -124Z" fill="#c8cfdd"/>
+      <ellipse cx="-14" cy="-84" rx="6" ry="9" fill="#26304a"/><ellipse cx="14" cy="-84" rx="6" ry="9" fill="#26304a"/></g>`;
+    const persona = (x, y, s, ropa, piel = "#c98d62", pelo = "#2b211d") => `<g transform="translate(${x} ${y}) scale(${s})">
+      <path d="M-27 0 L-23 -60 Q-22 -74 -8 -76 H8 Q22 -74 23 -60 L27 0Z" fill="${ropa}"/>
+      <circle cy="-94" r="19" fill="${piel}"/><path d="M-19 -96 Q-19 -115 0 -115 Q19 -115 19 -96 Q9 -105 0 -103 Q-9 -105 -19 -96Z" fill="${pelo}"/></g>`;
+    const nota = (x, y, c = "#f4be62") => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="8" ry="6" transform="rotate(-20 ${x} ${y})"/><rect x="${x+5}" y="${y-30}" width="3" height="30"/><path d="M${x+8} ${y-30} q12 4 10 16 q-2 -8 -10 -9Z"/></g>`;
+    const kubo = (x, y, s, luzVentana = true) => `<g transform="translate(${x} ${y}) scale(${s})">
+      <rect x="-72" y="-42" width="9" height="42" fill="#5b4330"/><rect x="63" y="-42" width="9" height="42" fill="#5b4330"/><rect x="-4" y="-42" width="8" height="42" fill="#5b4330"/>
+      <rect x="-84" y="-48" width="168" height="8" fill="#6d4b2f"/>
+      <rect x="-78" y="-124" width="156" height="78" fill="#a7784c"/>
+      <path d="M-50 -124 V-46 M-22 -124 V-46 M50 -124 V-46" stroke="#8a613b" stroke-width="3"/>
+      <rect x="-60" y="-106" width="46" height="40" rx="3" fill="${luzVentana ? "#ffd27a" : "#3a2b20"}"/>
+      <path d="M-37 -106 V-66 M-60 -86 H-14" stroke="#8a613b" stroke-width="3"/>
+      <rect x="10" y="-108" width="34" height="62" rx="2" fill="#6d4b2f"/>
+      <path d="M-108 -118 L0 -196 L108 -118Z" fill="#c99a52"/>
+      <path d="M-80 -128 l14 -10 M-50 -150 l14 -10 M-20 -172 l14 -10 M20 -170 l14 10 M50 -148 l14 10 M80 -126 l14 10" stroke="#a87d3c" stroke-width="3" stroke-linecap="round"/></g>`;
+    const calendario = (x, y, mes, dia) => `<g transform="translate(${x} ${y}) rotate(6)">
+      <rect width="96" height="92" rx="12" fill="#fdfaf3"/><path d="M0 12 Q0 0 12 0 H84 Q96 0 96 12 V30 H0Z" fill="#c8453b"/>
+      <text x="48" y="22" text-anchor="middle" ${FONT} font-weight="700" font-size="16" fill="#fff">${mes}</text>
+      <text x="48" y="78" text-anchor="middle" ${FONT} font-weight="800" font-size="40" fill="#1b2133">${dia}</text></g>`;
+    const estallido = (cx, cy, r, c) => Array.from({length:12}, (_, k) => {
+      const a = k * Math.PI / 6, x1 = cx + Math.cos(a)*r*.35, y1 = cy + Math.sin(a)*r*.35, x2 = cx + Math.cos(a)*r, y2 = cy + Math.sin(a)*r;
+      return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="${(cx+Math.cos(a)*(r+9)).toFixed(1)}" cy="${(cy+Math.sin(a)*(r+9)).toFixed(1)}" r="3.5" fill="${c}"/>`;
+    }).join("") + `<circle cx="${cx}" cy="${cy}" r="${r*.18}" fill="#fff"/>`;
+    const estrella = (cx, cy, r, c) => `<polygon fill="${c}" points="${Array.from({length:10}, (_, k) => {
+      const a = -Math.PI/2 + k*Math.PI/5, rr = k % 2 ? r*.42 : r; return `${(cx+Math.cos(a)*rr).toFixed(1)},${(cy+Math.sin(a)*rr).toFixed(1)}`; }).join(" ")}"/>`;
+    const mastil = (alto) => `<rect x="194" y="34" width="8" height="${alto}" rx="3" fill="#cfd6e2"/><circle cx="198" cy="32" r="9" fill="#f4be62"/>`;
+    const mesa = `<path d="M0 252 H640 V320 H0Z" fill="#7a4e33"/><path d="M0 252 H640 V262 H0Z" fill="#956142"/>`;
+    const regalo = (x, y, w, h, c, cinta) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${c}"/><rect x="${x-6}" y="${y}" width="${w+12}" height="18" rx="4" fill="${c}"/><rect x="${x-6}" y="${y}" width="${w+12}" height="18" rx="4" fill="#fff" opacity=".18"/>
+      <rect x="${x+w/2-7}" y="${y}" width="14" height="${h}" fill="${cinta}"/><path d="M${x+w/2} ${y} C${x+w/2-34} ${y-30} ${x+w/2-34} ${y+6} ${x+w/2} ${y}Z M${x+w/2} ${y} C${x+w/2+34} ${y-30} ${x+w/2+34} ${y+6} ${x+w/2} ${y}Z" fill="${cinta}"/>`;
+
+    // Escenas reutilizables para opciones de un mismo tipo (fechas y lugares).
+    const dosFechas = (mesA, diaA, mesB, diaB, i) => escena(`
+      ${calendario(156, 94, mesA, diaA)}${calendario(392, 94, mesB, diaB)}
+      <path d="M270 146 H364 M350 134 L364 146 L350 158" fill="none" stroke="#f4be62" stroke-width="6" stroke-linecap="round"/>`, i);
+    const lugares = (nombre, color, i, detalle) => escena(`
+      ${[182,458].map(x => `<g transform="translate(${x} 0)">
+        <rect x="-83" y="118" width="166" height="152" fill="${color}"/>
+        <path d="M-95 118 L0 65 L95 118Z" fill="#c99a52"/>
+        <rect x="-61" y="146" width="48" height="48" fill="#f4d58a"/>
+        <rect x="14" y="185" width="43" height="85" fill="#6d4b2f"/>
+        <rect x="-75" y="124" width="150" height="30" rx="4" fill="#f9f5ed"/>
+        <text y="146" text-anchor="middle" ${FONT} font-size="20" font-weight="700" fill="#26304a">${nombre}</text>
+        ${detalle}</g>`).join("")}
+      <path d="M265 278 H375 M358 265 L375 278 L358 291" fill="none" stroke="#e2bd78" stroke-width="5"/>`, i);
+    const flor = (x, y, color = "#f4be62") => `<g>
+      <path d="M${x} ${y+18} V${y+78} M${x} ${y+50} q-22 -24 -29 -12 M${x} ${y+58} q18 -23 28 -17" stroke="#5c9b45" stroke-width="5" fill="none"/>
+      ${[0,1,2,3,4].map(k => { const a = k*2*Math.PI/5; return `<circle cx="${x+Math.cos(a)*15}" cy="${y+Math.sin(a)*15}" r="11" fill="${color}"/>`; }).join("")}
+      <circle cx="${x}" cy="${y}" r="9" fill="#e8772e"/></g>`;
+    const libro = `<path d="M210 134 Q264 116 320 148 Q376 116 430 134 V260 Q374 240 320 270 Q266 240 210 260Z" fill="#f9f5ed" stroke="#c99a52" stroke-width="6"/>
+      <path d="M320 148 V270 M232 178 Q268 170 300 186 M232 202 Q268 194 300 210 M340 186 Q372 170 408 178 M340 210 Q372 194 408 202" fill="none" stroke="#9aa4b6" stroke-width="4"/>`;
+
+    const dibujos = {
+      // Acciones posibles junto a las casas.
+      llamarPuerta: i => escena(`${kubo(325, 270, 1.1)}${persona(165, 280, 1.15, "#3d7bd9")}
+        <path d="M187 188 L267 158" stroke="#c98d62" stroke-width="15" stroke-linecap="round"/>
+        <circle cx="284" cy="160" r="10" fill="#f4be62"/><path d="M296 142 l22 -15 M300 162 h26 M296 181 l22 15" stroke="#f4be62" stroke-width="4"/>`, i),
+      encenderVelas: i => escena(`${mesa}${vela(270, 253, 74)}${vela(352, 253, 60)}${vela(426, 253, 48)}
+        ${persona(137, 254, 1.45, "#3d7bd9")}
+        <path d="M170 168 L232 182" stroke="#c98d62" stroke-width="12" stroke-linecap="round"/>
+        <path d="M232 182 L262 146" stroke="#a7784c" stroke-width="3"/>
+        <path d="M264 138 q8 10 0 17 q-8 -7 0 -17Z" fill="#ffc94d"/>`, i, {suelo:false}),
+      dejarFlores: i => escena(`${kubo(458, 276, .86)}${persona(174, 274, 1.25, "#3d7bd9")}
+        <path d="M206 188 L310 222" stroke="#c98d62" stroke-width="13" stroke-linecap="round"/>
+        ${flor(324, 171, "#f9f5ed")}${flor(357, 176, "#e86d8a")}
+        <path d="M309 221 L362 221 L347 262 H324Z" fill="#b88746"/>`, i),
+      escuchar: i => escena(`${kubo(140, 272, .85)}${persona(432, 280, 1.32, "#5ec1a1")}
+        ${fantasma(220, 270, .72)}${nota(284, 132)}${nota(320, 102)}
+        <path d="M391 151 q-22 0 -22 24 q0 15 13 18 M378 164 q-9 10 0 19" stroke="#f9f5ed" stroke-width="5" fill="none" stroke-linecap="round"/>`, i),
+      cocinar: i => escena(`${mesa}${persona(152, 251, 1.25, "#5ec1a1")}
+        <rect x="290" y="150" width="196" height="98" rx="12" fill="#9aa4b6"/>
+        <path d="M278 166 h-34 M498 166 h34 M320 140 H456" stroke="#cfd6e2" stroke-width="12" stroke-linecap="round"/>
+        <path d="M332 100 q-20 -22 0 -42 M388 100 q-20 -22 0 -42 M444 100 q-20 -22 0 -42" stroke="#f9f5ed" stroke-width="7" fill="none" opacity=".7"/>
+        <rect x="316" y="239" width="148" height="34" fill="#5b636f"/>
+        <ellipse cx="551" cy="254" rx="49" ry="11" fill="#f9f5ed"/>
+        <rect x="522" y="229" width="58" height="21" rx="10" fill="#5c9b45"/>
+        <path d="M540 229 V250 M562 229 V250" stroke="#e6d6a8" stroke-width="4"/>`, i, {suelo:false}),
+      // Personas y objetos del diálogo.
+      escuela: i => escena(`<rect x="154" y="90" width="332" height="178" fill="#b88746"/>
+        <path d="M136 96 L320 38 L504 96Z" fill="#c99a52"/>
+        <rect x="246" y="112" width="148" height="37" rx="4" fill="#f9f5ed"/>
+        <text x="320" y="139" text-anchor="middle" ${FONT} font-size="25" font-weight="700" fill="#26304a">SCHOOL</text>
+        <rect x="282" y="202" width="76" height="66" fill="#6d4b2f"/>
+        ${persona(208, 272, .65, "#3d7bd9")}${persona(436, 272, .65, "#e86d8a")}`, i),
+      trabajo: i => escena(`${mesa}${persona(320, 248, 1.38, "#3d7bd9")}
+        <rect x="406" y="194" width="116" height="12" fill="#c99a52"/>
+        <rect x="435" y="145" width="76" height="52" rx="4" fill="#cfd6e2"/>
+        <path d="M340 169 L430 184" stroke="#c98d62" stroke-width="13" stroke-linecap="round"/>
+        <rect x="188" y="149" width="65" height="95" fill="#9aa4b6"/>
+        <path d="M206 169 H238 M206 187 H238 M206 205 H238" stroke="#f9f5ed" stroke-width="5"/>`, i, {suelo:false}),
+      familia: i => escena(`${kubo(320, 261, 1.22)}
+        ${persona(256, 278, .82, "#3d7bd9")}${persona(337, 278, .86, "#5ec1a1")}${persona(405, 278, .64, "#e86d8a")}`, i),
+      floresVelas: i => escena(`${mesa}${vela(245, 252, 72)}${vela(410, 252, 64)}
+        ${flor(310, 121, "#f9f5ed")}${flor(356, 128, "#e86d8a")}
+        <path d="M290 197 H374 L364 252 H300Z" fill="#b88746"/>`, i, {suelo:false}),
+      ropaZapatos: i => escena(`${mesa}<path d="M252 113 L284 89 H356 L388 113 L431 156 L402 182 L374 161 V240 H266 V161 L238 182 L209 156Z" fill="#6aa3f0"/>
+        <path d="M284 89 Q320 134 356 89" fill="none" stroke="#f9f5ed" stroke-width="7"/>
+        <path d="M220 244 h76 l22 22 v9 h-120 q-10 -20 22 -31Z M344 244 h76 q32 11 22 31 H322 v-9Z" fill="#42506b"/>
+        <path d="M205 264 H312 M328 264 H435" stroke="#f9f5ed" stroke-width="5"/>`, i, {suelo:false}),
+      cartas: i => escena(`${mesa}<g transform="rotate(-8 270 190)">
+        <rect x="170" y="105" width="210" height="147" rx="5" fill="#f9f5ed"/>
+        <path d="M194 140 H344 M194 169 H324 M194 198 H344" stroke="#9aa4b6" stroke-width="5"/></g>
+        <path d="M379 256 l94 -110 l12 10 l-91 112Z" fill="#f4be62"/>
+        <rect x="444" y="90" width="90" height="75" rx="4" fill="#e86d8a"/>
+        <path d="M488 129 q-15 -18 -26 -6 q-6 12 26 31 q32 -19 26 -31 q-11 -12 -26 6Z" fill="#f9f5ed"/>
+        <rect x="443" y="164" width="113" height="81" rx="4" fill="#e9e2d2"/>
+        <path d="M443 164 L499 209 L556 164" fill="none" stroke="#b88746" stroke-width="4"/>`, i, {suelo:false}),
+      fechasOctNov: i => dosFechas("OCT", "31", "NOV", "1", i),
+      fechasNovDic: i => dosFechas("NOV", "30", "DEC", "1", i),
+      fechasDicEne: i => dosFechas("DEC", "31", "JAN", "1", i),
+      fechasEneFeb: i => dosFechas("JAN", "31", "FEB", "1", i),
+      fruta: i => escena(`${mesa}<ellipse cx="316" cy="246" rx="170" ry="25" fill="#f9f5ed"/>
+        ${[[250,205,"#e85d5d"],[320,212,"#f4be62"],[385,202,"#5ec1a1"]].map(([x,y,c]) => `<circle cx="${x}" cy="${y}" r="42" fill="${c}"/><path d="M${x} ${y-42} q15 -26 35 -18 q-5 24 -35 18Z" fill="#5c9b45"/>`).join("")}`, i, {suelo:false}),
+      pan: i => escena(`${mesa}<ellipse cx="320" cy="253" rx="182" ry="27" fill="#f9f5ed"/>
+        ${[236,320,404].map(x => `<path d="M${x-51} 228 Q${x-51} 157 ${x} 151 Q${x+51} 157 ${x+51} 228Z" fill="#c99a52"/>
+          <path d="M${x-34} 197 q34 -35 68 0" fill="none" stroke="#f4d58a" stroke-width="6"/>`).join("")}`, i, {suelo:false}),
+      sopa: i => escena(`${mesa}<path d="M205 186 H435 Q427 267 320 272 Q213 267 205 186Z" fill="#f9f5ed"/>
+        <ellipse cx="320" cy="188" rx="118" ry="35" fill="#c99a52"/>
+        <path d="M232 188 q25 -16 50 0 t50 0 t50 0 t50 0" fill="none" stroke="#f4d58a" stroke-width="7"/>
+        <path d="M266 137 q-18 -22 0 -46 M328 137 q-18 -22 0 -46 M390 137 q-18 -22 0 -46" fill="none" stroke="#f9f5ed" stroke-width="7" opacity=".8"/>`, i, {suelo:false}),
+      cuento: i => escena(`${mesa}${libro}
+        ${persona(112, 248, 1.25, "#5ec1a1")}
+        <path d="M146 172 L214 213" stroke="#c98d62" stroke-width="11" stroke-linecap="round"/>`, i, {suelo:false}),
+      saludar: i => escena(`${persona(260, 275, 1.45, "#3d7bd9")}${persona(484, 275, 1.25, "#e86d8a")}
+        <path d="M287 158 L342 99" stroke="#c98d62" stroke-width="13" stroke-linecap="round"/>
+        <path d="M338 100 l8 -19 M340 100 l20 -12 M341 102 l24 2" stroke="#c98d62" stroke-width="5" stroke-linecap="round"/>
+        <path d="M136 93 q0 -36 43 -36 h102 q43 0 43 36 q0 36 -43 36 h-74 l-27 18 v-18 q-44 0 -44 -36Z" fill="#f9f5ed"/>
+        <text x="230" y="106" text-anchor="middle" ${FONT} font-size="38" font-weight="700" fill="#26304a">HI!</text>`, i),
+      nombre: i => escena(`${mesa}<rect x="210" y="84" width="220" height="171" rx="8" fill="#f9f5ed"/>
+        <rect x="228" y="100" width="184" height="45" rx="4" fill="#e86d8a"/>
+        <text x="320" y="133" text-anchor="middle" ${FONT} font-weight="700" font-size="25" fill="#fff">NAME</text>
+        <path d="M245 194 H395" stroke="#cfd6e2" stroke-width="5"/><path d="M250 240 L392 183" stroke="#3d7bd9" stroke-width="9" stroke-linecap="round"/>`, i, {suelo:false}),
+      escuelas: i => lugares("SCHOOL", "#b88746", i, `<circle cy="84" r="13" fill="#f4be62"/>`),
+      tiendas: i => lugares("SHOP", "#69839c", i, `<path d="M-84 154 h168 v24 h-168Z" fill="#e86d8a"/>`),
+      granjas: i => lugares("FARM", "#a7784c", i, `<path d="M-74 268 q10 -25 20 0 t20 0 t20 0" fill="none" stroke="#5c9b45" stroke-width="8"/>`),
+      ensenar: i => escena(`<rect x="172" y="60" width="290" height="145" rx="6" fill="#5b636f"/>
+        <rect x="184" y="72" width="266" height="121" fill="#29403f"/>
+        <path d="M240 154 v-44 q0 -32 30 -32 q30 0 30 32 v44 M328 123 h80" fill="none" stroke="#f9f5ed" stroke-width="7"/>
+        ${persona(154, 267, 1.13, "#3d7bd9")}${persona(358, 281, .75, "#e86d8a")}${persona(466, 281, .75, "#5ec1a1")}
+        <path d="M180 167 L245 138" stroke="#c98d62" stroke-width="12"/>`, i),
+      vender: i => escena(`${persona(320, 280, 1.15, "#5ec1a1")}
+        <path d="M149 148 H491 L462 110 H178Z" fill="#e86d8a"/>
+        <rect x="158" y="148" width="10" height="124" fill="#c99a52"/><rect x="472" y="148" width="10" height="124" fill="#c99a52"/>
+        <rect x="153" y="216" width="334" height="57" fill="#b88746"/>
+        ${[223,285,348,410].map((x,k) => `<circle cx="${x}" cy="214" r="23" fill="${k%2 ? '#f4be62' : '#5ec1a1'}"/>`).join("")}
+        <circle cx="499" cy="164" r="27" fill="#f4be62"/><text x="499" y="177" text-anchor="middle" ${FONT} font-size="34" fill="#5a3a12">$</text>`, i),
+      // Recorrido entre casas: evita mostrar una puerta cerrada.
+      hogares: i => escena(`${luna(520, 64)}${kubo(154, 246, .58)}${kubo(470, 246, .58)}
+        <path d="M158 280 Q320 222 470 280" fill="none" stroke="#e2bd78" stroke-width="7" stroke-dasharray="12 9"/>
+        <path d="M448 260 L474 281 L442 286" fill="none" stroke="#e2bd78" stroke-width="6"/>
+        ${persona(310, 280, .8, "#3d7bd9")}${nota(346, 168)}`, i),
+      // Retrato, flores y velas: recuerdo de un ser querido.
+      recuerdo: i => escena(`${mesa}${brillo(320, 154, 130, .35)}
+        <rect x="258" y="62" width="124" height="174" rx="5" fill="#c99a52"/>
+        <rect x="268" y="72" width="104" height="154" fill="#69839c"/>
+        ${persona(320, 224, .9, "#6b426f", "#b07148", "#ddd5ce")}
+        ${vela(210, 252, 65)}${vela(430, 252, 65)}
+        <path d="M282 275 L306 242 M352 275 L334 244" stroke="#5c9b45" stroke-width="5"/>
+        ${[298,320,342].map((x,k) => `<g fill="${k%2 ? '#f4be62' : '#f9f5ed'}"><circle cx="${x-8}" cy="246" r="9"/><circle cx="${x+8}" cy="246" r="9"/><circle cx="${x}" cy="238" r="9"/><circle cx="${x}" cy="254" r="9"/></g><circle cx="${x}" cy="246" r="5" fill="#e8772e"/>`).join("")}`, i, {suelo:false}),
+
+      // --- Pregunta 1 ---
+      vampiro: i => escena(`${luna(498, 78)}
+        <path d="M466 74 q10 -14 20 -3 q6 -10 12 0 q6 -10 12 3 q10 -11 20 3 q-15 -2 -22 11 q-4 -7 -10 -7 q-6 0 -10 7 q-8 -14 -22 -14z" fill="#1b1626"/>
+        <g transform="translate(320 0)">
+          <path d="M-64 152 L-122 284 H122 L64 152Z" fill="#2a1630"/><path d="M-42 160 L-84 284 H84 L42 160Z" fill="#8e2a3a"/>
+          <path d="M-30 152 H30 L36 284 H-36Z" fill="#1d1a2b"/><path d="M-7 152 L0 178 L7 152Z" fill="#f9f5ed"/>
+          <path d="M-64 152 L-44 104 L-24 152Z M64 152 L44 104 L24 152Z" fill="#5a1d2e"/>
+          <circle cy="120" r="32" fill="#e5e0ec"/><path d="M-33 118 Q-31 82 0 82 Q31 82 33 118 L22 104 L0 122 L-22 104Z" fill="#1d1a2b"/>
+          <circle cx="-11" cy="122" r="4" fill="#9b2c3e"/><circle cx="11" cy="122" r="4" fill="#9b2c3e"/>
+          <path d="M-12 137 Q0 145 12 137" stroke="#5a1d2e" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-8 139 l3 8 l3 -7Z M2 140 l3 7 l3 -8Z" fill="#fff"/></g>`, i),
+      sabanas: i => escena(`${luna(500, 70)}${kubo(150, 272, .62, true)}
+        <rect x="246" y="266" width="10" height="12" rx="3" fill="#a86f4b"/><rect x="268" y="266" width="10" height="12" rx="3" fill="#a86f4b"/>
+        <rect x="370" y="266" width="9" height="11" rx="3" fill="#a86f4b"/><rect x="390" y="266" width="9" height="11" rx="3" fill="#a86f4b"/>
+        ${fantasma(262, 270, 1.05)}${fantasma(385, 270, .88)}
+        <path d="M428 200 Q446 196 450 214" stroke="#cfd6e2" stroke-width="3" fill="none"/>${brillo(452, 232, 40, .8)}
+        <rect x="440" y="214" width="24" height="30" rx="6" fill="#f4be62"/><rect x="446" y="220" width="12" height="18" rx="3" fill="#fff4d0"/>`, i),
+      soldados: i => escena(`<g transform="translate(320 0)">
+          <path d="M-30 282 L-26 182 Q-24 164 -8 162 H8 Q24 164 26 182 L30 282Z" fill="#4c6b3c"/><path d="M-26 214 H26 V226 H-26Z" fill="#2f2a22"/><rect x="-4" y="212" width="8" height="16" fill="#d4a94f"/>
+          <circle cy="138" r="22" fill="#c98d62"/><path d="M-30 136 Q-28 104 0 104 Q28 104 30 136Z" fill="#5d7a4a"/><rect x="-32" y="132" width="64" height="7" rx="3" fill="#43603a"/></g>
+        <line x1="380" y1="140" x2="440" y2="260" stroke="#d9dee8" stroke-width="7" stroke-linecap="round"/><path d="M372 152 L392 140" stroke="#8a613b" stroke-width="9" stroke-linecap="round"/>
+        <circle cx="262" cy="214" r="40" fill="#8a613b"/><circle cx="262" cy="214" r="30" fill="#a7784c"/><circle cx="262" cy="214" r="9" fill="#d4a94f"/>
+        ${estrella(470, 80, 14, "#f4be62")}`, i),
+      desfile: i => escena(`<path d="M110 40 Q320 90 530 40" stroke="#f9f5ed" stroke-width="2" fill="none" opacity=".6"/>
+        ${["#e85d5d","#f4be62","#5ec1a1","#6aa3f0","#d873d6","#e85d5d","#f4be62","#5ec1a1","#6aa3f0"].map((c,k) => { const x = 130 + k*45, y = 40 + Math.sin(k/8*Math.PI)*42; return `<path d="M${x-14} ${y} L${x+14} ${y+2} L${x} ${y+28}Z" fill="${c}"/>`; }).join("")}
+        <g transform="translate(320 0)">
+          <path d="M-36 284 L-30 186 Q-28 168 -10 166 H10 Q28 168 30 186 L36 284Z" fill="#e85d5d"/><path d="M-36 284 L-33 236 H33 L36 284Z" fill="#6aa3f0"/><path d="M-30 200 H30 V214 H-30Z" fill="#f4be62"/>
+          <circle cy="140" r="23" fill="#c98d62"/>
+          <path d="M-30 128 Q-40 70 -20 66 Q-12 100 -6 120 M0 120 Q-2 60 12 56 Q14 96 8 120 M14 124 Q34 74 48 84 Q30 108 22 128" fill="#5ec1a1"/>
+          <path d="M-28 126 Q0 112 28 126 L26 134 H-26Z" fill="#f4be62"/>
+          <path d="M-22 140 Q-11 132 0 140 Q11 132 22 140 Q11 152 0 146 Q-11 152 -22 140Z" fill="#d873d6"/></g>
+        ${[[200,140,"#f4be62"],[440,120,"#5ec1a1"],[180,210,"#6aa3f0"],[460,200,"#e85d5d"],[240,100,"#d873d6"],[410,170,"#f4be62"]].map(([x,y,c]) => `<rect x="${x}" y="${y}" width="10" height="6" rx="1" fill="${c}" transform="rotate(${x%60} ${x} ${y})"/>`).join("")}`, i),
+
+      // --- Pregunta 2 ---
+      baloncesto: i => escena(`<path d="M0 262 H640 V320 H0Z" fill="#b07a45"/><path d="M0 262 H640" stroke="#d29a5c" stroke-width="4"/>
+        <rect x="422" y="132" width="10" height="132" fill="#9aa4b6"/>
+        <rect x="356" y="48" width="142" height="92" rx="6" fill="#f9f5ed"/><rect x="398" y="78" width="58" height="44" fill="none" stroke="#c8453b" stroke-width="5"/>
+        <path d="M398 148 L406 182 H448 L456 148" stroke="#f9f5ed" stroke-width="2" fill="none"/><path d="M406 148 L416 182 M427 148 V182 M448 148 L438 182 M402 162 H452" stroke="#f9f5ed" stroke-width="2"/>
+        <ellipse cx="427" cy="148" rx="31" ry="6" fill="none" stroke="#e8742f" stroke-width="5"/>
+        <circle cx="252" cy="196" r="54" fill="#e67e30"/><path d="M252 142 V250 M198 196 H306 M214 158 Q246 196 214 234 M290 158 Q258 196 290 234" stroke="#5a2d12" stroke-width="3.5" fill="none"/>
+        <circle cx="236" cy="174" r="10" fill="#fff" opacity=".25"/>`, i, {suelo:false}),
+      coche: i => escena(`<path d="M0 262 H640 V320 H0Z" fill="#2a2f3c"/><path d="M40 292 H110 M180 292 H250 M320 292 H390 M460 292 H530" stroke="#f4be62" stroke-width="5"/>
+        <path d="M140 246 L150 186 Q156 170 182 168 L246 166 L288 122 Q296 114 312 114 L440 114 Q456 114 466 126 L500 166 Q528 170 532 190 L536 246Z" fill="#c8453b"/>
+        <path d="M300 128 L268 162 H372 V128Z M386 128 V162 H486 L456 132 Q450 128 442 128Z" fill="#a8d3f0"/>
+        <path d="M140 210 H536" stroke="#9e3029" stroke-width="3"/><rect x="514" y="182" width="20" height="12" rx="3" fill="#ffe7a3"/><rect x="142" y="186" width="14" height="10" rx="3" fill="#ff8a7a"/>
+        ${[214, 456].map(x => `<circle cx="${x}" cy="248" r="32" fill="#1b1d26"/><circle cx="${x}" cy="248" r="13" fill="#9aa4b6"/>`).join("")}`, i, {suelo:false}),
+      cantar: i => escena(`${luna(520, 62)}${brillo(122, 202, 70, .5)}${kubo(152, 272, .9, true)}
+        <circle cx="122" cy="196" r="10" fill="#6d4b2f"/><path d="M110 216 Q122 202 134 216Z" fill="#6d4b2f"/>
+        <rect x="372" y="266" width="9" height="11" rx="3" fill="#a86f4b"/><rect x="392" y="266" width="9" height="11" rx="3" fill="#a86f4b"/>
+        <rect x="466" y="266" width="9" height="11" rx="3" fill="#a86f4b"/><rect x="486" y="266" width="9" height="11" rx="3" fill="#a86f4b"/>
+        ${fantasma(386, 270, .82)}${fantasma(480, 270, .76)}
+        ${nota(300, 160)}${nota(334, 116, "#f9f5ed")}${nota(270, 104)}${nota(240, 150, "#f9f5ed")}`, i),
+      cometas: i => escena(`<circle cx="540" cy="60" r="30" fill="#ffd66b"/>
+        <path d="M250 46 L294 112 L250 186 L206 112Z" fill="#e85d5d"/><path d="M250 46 L294 112 H206Z" fill="#f4be62"/><path d="M250 46 V186 M206 112 H294" stroke="#7a3a2a" stroke-width="2"/>
+        <path d="M250 186 Q236 210 256 226 Q272 244 252 262" stroke="#7a3a2a" stroke-width="2" fill="none"/><path d="M240 204 l10 6 l-10 6Z M252 238 l10 6 l-10 6Z" fill="#6aa3f0"/>
+        <path d="M412 64 L442 104 L412 152 L382 104Z" fill="#5ec1a1"/><path d="M412 64 L442 104 H382Z" fill="#6aa3f0"/><path d="M412 152 Q426 172 410 188" stroke="#2f5552" stroke-width="2" fill="none"/>
+        <path d="M250 186 L332 236 M412 152 L340 236" stroke="#fff" stroke-width="1.5" opacity=".9"/>
+        ${persona(338, 280, .55, "#c8453b")}`, i, {cielo:DIA, suelo:"#6fae57"}),
+
+      // --- Pregunta 3 ---
+      almas: i => escena(`${brillo(320, 130, 150, .45)}${fantasma(320, 196, 1.05, .55)}
+        <path d="M262 214 Q320 236 378 214" stroke="#fff" stroke-width="2" fill="none" opacity=".35"/>
+        ${vela(214, 284, 52)}${vela(262, 284, 38)}${vela(378, 284, 44)}${vela(426, 284, 56)}
+        <circle cx="300" cy="278" r="9" fill="#f4a63b"/><circle cx="318" cy="282" r="9" fill="#f4be62"/><circle cx="338" cy="278" r="9" fill="#f4a63b"/>`, i),
+      rey: i => escena(`<g fill="#00000033"><path d="M160 272 V120 h20 v-14 h14 v14 h14 v-14 h14 v14 h20 V272Z"/><path d="M420 272 V120 h20 v-14 h14 v14 h14 v-14 h14 v14 h20 V272Z"/><path d="M242 272 V160 h156 V272Z"/></g>
+        <path d="M226 236 L236 132 L280 186 L320 112 L360 186 L404 132 L414 236Z" fill="#f4be62"/><path d="M320 112 L360 186 L404 132 L414 236 H352Z" fill="#d99a3e"/>
+        <rect x="222" y="226" width="196" height="30" rx="6" fill="#e3a845"/>
+        <circle cx="236" cy="128" r="9" fill="#f9f5ed"/><circle cx="320" cy="106" r="10" fill="#f9f5ed"/><circle cx="404" cy="128" r="9" fill="#f9f5ed"/>
+        <circle cx="270" cy="241" r="8" fill="#c8453b"/><circle cx="320" cy="241" r="9" fill="#5ec1a1"/><circle cx="370" cy="241" r="8" fill="#6aa3f0"/>`, i),
+      piratas: i => escena(`${luna(512, 64)}
+        <rect x="314" y="62" width="7" height="178" fill="#5b4330"/>
+        <path d="M230 82 Q300 120 312 82 V208 Q270 196 230 208Z" fill="#f2ead8"/><path d="M324 92 Q396 120 410 92 V200 Q370 190 324 200Z" fill="#e4dac2"/>
+        <path d="M321 40 H372 V72 H321Z" fill="#1b1626"/><circle cx="346" cy="52" r="8" fill="#f9f5ed"/><path d="M336 64 L356 70 M356 64 L336 70" stroke="#f9f5ed" stroke-width="3"/>
+        <path d="M178 226 H462 L428 270 H212Z" fill="#7a4e33"/><path d="M190 238 H450" stroke="#5b3622" stroke-width="4"/>
+        <path d="M0 262 Q40 250 80 262 T160 262 T240 262 T320 262 T400 262 T480 262 T560 262 T640 262 V320 H0Z" fill="#2c5f8a"/>
+        <path d="M0 286 Q40 276 80 286 T160 286 T240 286 T320 286 T400 286 T480 286 T560 286 T640 286 V320 H0Z" fill="#244e74"/>`, i, {suelo:false}),
+      espacio: i => escena(`<circle cx="176" cy="96" r="38" fill="#d873d6"/><ellipse cx="176" cy="96" rx="64" ry="13" fill="none" stroke="#f4be62" stroke-width="5" transform="rotate(-18 176 96)"/>
+        <circle cx="470" cy="230" r="16" fill="#6aa3f0"/>
+        <g transform="rotate(28 340 160)">
+          <path d="M340 236 Q352 272 340 294 Q328 272 340 236Z" fill="#ffc94d"/>
+          <path d="M316 216 L294 248 L318 236Z M364 216 L386 248 L362 236Z" fill="#c8453b"/>
+          <path d="M340 62 Q376 102 376 182 L370 236 H310 L304 182 Q304 102 340 62Z" fill="#eef1f7"/><path d="M340 62 Q376 102 376 182 L370 236 H352 Q364 140 340 62Z" fill="#c8cfdd"/>
+          <path d="M340 62 Q356 78 364 96 H316 Q324 78 340 62Z" fill="#c8453b"/>
+          <circle cx="340" cy="140" r="17" fill="#6aa3f0" stroke="#9aa4b6" stroke-width="5"/></g>`, i, {suelo:false}),
+
+      // --- Pregunta 4 ---
+      pelotas: i => escena(`<circle cx="256" cy="210" r="58" fill="#f9f5ed"/>
+        <polygon points="256,188 277,203 269,228 243,228 235,203" fill="#1b1d26"/>
+        <path d="M256 188 V156 M277 203 L306 192 M269 228 L286 256 M243 228 L226 256 M235 203 L206 192" stroke="#1b1d26" stroke-width="4"/>
+        <path d="M244 154 L256 152 L268 154 L262 166 H250Z M306 186 L313 200 L310 214 L298 206 L300 192Z M202 186 L199 200 L202 214 L214 206 L212 192Z" fill="#1b1d26"/>
+        <circle cx="404" cy="222" r="46" fill="#f9f5ed"/><path d="M404 176 Q376 222 404 268 Q432 222 404 176Z" fill="#c8453b"/><path d="M358 222 Q404 196 450 222 Q404 248 358 222Z" fill="#6aa3f0" opacity=".9"/>
+        <circle cx="404" cy="222" r="8" fill="#f4be62"/>`, i),
+      herramientas: i => escena(`<rect x="214" y="170" width="212" height="102" rx="10" fill="#c8453b"/><rect x="214" y="170" width="212" height="30" rx="8" fill="#a93a32"/>
+        <path d="M284 170 V146 Q284 136 294 136 H346 Q356 136 356 146 V170" stroke="#5b636f" stroke-width="9" fill="none"/>
+        <rect x="306" y="194" width="28" height="14" rx="3" fill="#d4a94f"/>
+        <g transform="rotate(-28 200 160)"><rect x="192" y="110" width="14" height="120" rx="5" fill="#a7784c"/><rect x="170" y="96" width="60" height="26" rx="5" fill="#9aa4b6"/></g>
+        <g transform="rotate(30 450 170)"><rect x="443" y="120" width="14" height="110" rx="6" fill="#9aa4b6"/><path d="M432 98 Q450 84 468 98 L462 126 H438Z" fill="#9aa4b6"/><rect x="444" y="92" width="12" height="20" fill="#1d2741"/></g>`, i),
+      boletos: i => escena(`<g transform="translate(-30 -34) rotate(-10 280 170)"><rect x="170" y="116" width="220" height="104" rx="12" fill="#f4be62"/><path d="M226 120 V216" stroke="#b9842f" stroke-width="3" stroke-dasharray="7 6"/>
+          <text x="308" y="164" text-anchor="middle" ${FONT} font-weight="800" font-size="22" fill="#5a3a12">ADMIT</text><text x="308" y="192" text-anchor="middle" ${FONT} font-weight="800" font-size="22" fill="#5a3a12">ONE</text>${estrella(198, 168, 12, "#5a3a12")}</g>
+        <g transform="translate(40 20) rotate(8 380 200)"><rect x="276" y="150" width="220" height="104" rx="12" fill="#e86d8a"/><path d="M332 154 V250" stroke="#b44b64" stroke-width="3" stroke-dasharray="7 6"/>
+          <text x="414" y="198" text-anchor="middle" ${FONT} font-weight="800" font-size="22" fill="#fff">MOVIE</text><text x="414" y="224" text-anchor="middle" ${FONT} font-weight="700" font-size="14" fill="#fff">ROW 3</text>${estrella(304, 202, 12, "#fff")}</g>`, i),
+      comidaDinero: i => escena(`${mesa}
+        <ellipse cx="290" cy="238" rx="132" ry="40" fill="#b88746"/><ellipse cx="290" cy="232" rx="118" ry="32" fill="#d4a560"/>
+        <path d="M190 232 Q290 270 390 232 M200 222 Q290 254 380 222" stroke="#b88746" stroke-width="2" fill="none"/>
+        ${[[220,214],[262,206],[304,212],[346,220]].map(([x,y]) => `<g transform="rotate(-12 ${x} ${y})"><rect x="${x-22}" y="${y-12}" width="56" height="24" rx="12" fill="#5c9b45"/><path d="M${x-6} ${y-12} V${y+12} M${x+18} ${y-12} V${y+12}" stroke="#e6d6a8" stroke-width="3"/></g>`).join("")}
+        <circle cx="250" cy="236" r="14" fill="#8a5aa8"/><circle cx="284" cy="240" r="14" fill="#f9f5ed"/><circle cx="318" cy="238" r="14" fill="#8a5aa8"/>
+        ${[0,1,2,3,4].map(k => `<ellipse cx="452" cy="${254-k*12}" rx="30" ry="10" fill="#d99a3e"/><ellipse cx="452" cy="${250-k*12}" rx="30" ry="10" fill="#f4be62"/>`).join("")}
+        <ellipse cx="452" cy="202" rx="18" ry="5" fill="none" stroke="#d99a3e" stroke-width="2"/>`, i, {suelo:false}),
+
+      // --- Pregunta 5 ---
+      todosSantos: i => escena(`${calendario(436, 34, "NOV", "1")}
+        ${[[214,"#7d8798"],[320,"#8e98a8"],[426,"#7d8798"]].map(([x,c]) => `<path d="M${x-40} 270 V176 Q${x-40} 140 ${x} 140 Q${x+40} 140 ${x+40} 176 V270Z" fill="${c}"/><path d="M${x} 162 V214 M${x-16} 180 H${x+16}" stroke="#5b6475" stroke-width="7" stroke-linecap="round"/>`).join("")}
+        ${vela(160, 286, 34)}${vela(270, 286, 30)}${vela(370, 286, 36)}${vela(480, 286, 30)}
+        ${[196,232,302,340,404,446].map((x,k) => `<circle cx="${x}" cy="${276-(k%2)*6}" r="9" fill="${k%2?"#f4be62":"#f9f5ed"}"/><circle cx="${x}" cy="${276-(k%2)*6}" r="3.5" fill="#d99a3e"/>`).join("")}`, i, {estrellas:false}),
+      sanValentin: i => escena(`${calendario(436, 34, "FEB", "14")}
+        <path d="M290 270 C190 206 176 140 214 112 C248 88 284 106 290 132 C296 106 332 88 366 112 C404 140 390 206 290 270Z" fill="#e8577a"/>
+        <path d="M232 128 Q246 114 262 122" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" opacity=".5"/>
+        <path d="M178 196 c-10 -8 -18 -2 -14 6 c3 6 14 10 14 10 c0 0 11 -4 14 -10 c4 -8 -4 -14 -14 -6z" fill="#f4a3b7"/>
+        <path d="M414 220 c-8 -6 -14 -2 -11 5 c2 5 11 8 11 8 c0 0 9 -3 11 -8 c3 -7 -3 -11 -11 -5z" fill="#f4a3b7"/>`, i),
+      anoNuevo: i => escena(`${calendario(436, 34, "JAN", "1")}
+        ${estallido(232, 110, 58, "#f4be62")}${estallido(360, 150, 46, "#e86d8a")}${estallido(190, 214, 34, "#5ec1a1")}
+        <path d="M232 168 Q228 230 236 272 M360 196 Q366 240 358 272" stroke="#fff" stroke-width="2" stroke-dasharray="3 7" opacity=".5" fill="none"/>`, i),
+      playa: i => escena(`<circle cx="470" cy="70" r="34" fill="#ffd66b"/>${brillo(470, 70, 70, .5)}
+        <path d="M0 200 H640 V250 H0Z" fill="#3d8fc6"/><path d="M0 214 Q40 208 80 214 T160 214 T240 214 T320 214 T400 214 T480 214 T560 214 T640 214" stroke="#a8d8f0" stroke-width="3" fill="none"/>
+        <path d="M0 244 Q320 226 640 244 V320 H0Z" fill="#f0d49a"/>
+        <rect x="273" y="132" width="6" height="140" fill="#7a4e33"/>
+        <path d="M176 140 Q276 50 376 140Z" fill="#e85d5d"/><path d="M226 140 Q236 76 276 70 Q260 90 256 140Z M296 140 Q292 90 276 70 Q316 76 326 140Z" fill="#f9f5ed"/>
+        <circle cx="388" cy="252" r="22" fill="#f9f5ed"/><path d="M388 230 Q374 252 388 274 Q402 252 388 230Z" fill="#6aa3f0"/>`, i, {cielo:["#ffcf8a","#a8dbf2"], suelo:false}),
+
+      // --- Pregunta 6 (banderas) ---
+      italia: i => escena(`${mastil(250)}<rect x="202" y="58" width="80" height="160" fill="#009246"/><rect x="282" y="58" width="80" height="160" fill="#f1f2f1"/><rect x="362" y="58" width="80" height="160" fill="#ce2b37"/>
+        <rect x="202" y="58" width="240" height="160" fill="url(#onda)"/>`, i),
+      filipinas: i => escena(`${mastil(250)}<rect x="202" y="64" width="256" height="64" fill="#0038a8"/><rect x="202" y="128" width="256" height="64" fill="#ce1126"/>
+        <polygon points="202,64 202,192 313,128" fill="#fff"/>
+        <circle cx="240" cy="128" r="13" fill="#fcd116"/>
+        ${Array.from({length:8}, (_, k) => { const a = k*Math.PI/4; return `<line x1="${(240+Math.cos(a)*17).toFixed(1)}" y1="${(128+Math.sin(a)*17).toFixed(1)}" x2="${(240+Math.cos(a)*27).toFixed(1)}" y2="${(128+Math.sin(a)*27).toFixed(1)}" stroke="#fcd116" stroke-width="4" stroke-linecap="round"/>`; }).join("")}
+        ${estrella(216, 80, 10, "#fcd116")}${estrella(216, 176, 10, "#fcd116")}${estrella(292, 128, 10, "#fcd116")}
+        <rect x="202" y="64" width="256" height="128" fill="url(#onda)"/>`, i),
+      canada: i => escena(`${mastil(250)}<rect x="202" y="64" width="64" height="128" fill="#d52b1e"/><rect x="266" y="64" width="128" height="128" fill="#fff"/><rect x="394" y="64" width="64" height="128" fill="#d52b1e"/>
+        <polygon fill="#d52b1e" transform="translate(330 128) scale(1.05)" points="0,-48 8,-32 20,-36 15,-12 32,-22 36,-12 44,-14 36,6 44,10 14,20 16,32 2,30 2,48 -2,48 -2,30 -16,32 -14,20 -44,10 -36,6 -44,-14 -36,-12 -32,-22 -15,-12 -20,-36 -8,-32"/>
+        <rect x="202" y="64" width="256" height="128" fill="url(#onda)"/>`, i),
+      india: i => escena(`${mastil(250)}<rect x="202" y="58" width="240" height="54" fill="#ff9933"/><rect x="202" y="112" width="240" height="54" fill="#fff"/><rect x="202" y="166" width="240" height="54" fill="#138808"/>
+        <circle cx="322" cy="139" r="21" fill="none" stroke="#000080" stroke-width="3"/>
+        ${Array.from({length:12}, (_, k) => { const a = k*Math.PI/6; return `<line x1="322" y1="139" x2="${(322+Math.cos(a)*20).toFixed(1)}" y2="${(139+Math.sin(a)*20).toFixed(1)}" stroke="#000080" stroke-width="1.5"/>`; }).join("")}
+        <rect x="202" y="58" width="240" height="162" fill="url(#onda)"/>`, i),
+
+      // --- Pregunta 7 ---
+      pizza: i => escena(`${mesa}<ellipse cx="320" cy="236" rx="150" ry="44" fill="#e9e2d2"/>
+        <ellipse cx="320" cy="226" rx="128" ry="50" fill="#d99a4e"/><ellipse cx="320" cy="222" rx="112" ry="42" fill="#f6c94a"/>
+        <path d="M320 222 L232 196 M320 222 L408 196 M320 222 L262 260 M320 222 L378 260 M320 180 V222" stroke="#e0a83a" stroke-width="3"/>
+        ${[[276,208],[350,202],[300,240],[370,236],[250,232],[326,196]].map(([x,y]) => `<ellipse cx="${x}" cy="${y}" rx="14" ry="8" fill="#c8453b"/>`).join("")}
+        <path d="M392 214 q8 -8 14 0 q-6 6 -14 0Z M282 226 q8 -8 14 0 q-6 6 -14 0Z" fill="#4f8f3a"/>`, i, {suelo:false}),
+      hamburguesa: i => escena(`${mesa}<ellipse cx="320" cy="262" rx="140" ry="20" fill="#e9e2d2"/>
+        <path d="M228 230 H412 Q412 258 384 258 H256 Q228 258 228 230Z" fill="#d99a4e"/>
+        <rect x="222" y="206" width="196" height="28" rx="14" fill="#6b3a24"/>
+        <path d="M222 200 H418 L398 220 L380 204 L362 222 L342 204 L322 222 L300 204 L278 222 L258 204 L240 222Z" fill="#f4be62"/>
+        <path d="M216 196 Q236 184 256 196 T296 196 T336 196 T376 196 T424 196 V204 H216Z" fill="#5ec15e"/>
+        <path d="M222 192 Q222 112 320 108 Q418 112 418 192Z" fill="#e2a052"/><path d="M240 160 Q260 124 320 118" stroke="#f0bd78" stroke-width="8" fill="none" stroke-linecap="round"/>
+        ${[[290,140],[330,132],[360,150],[270,166],[320,160],[380,172],[300,178]].map(([x,y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="3" fill="#fbecc8"/>`).join("")}`, i, {suelo:false}),
+      suman: i => escena(`${mesa}<ellipse cx="320" cy="246" rx="164" ry="40" fill="#e9e2d2"/><ellipse cx="320" cy="242" rx="148" ry="32" fill="#f6f2e8"/>
+        ${[[300,228,-6],[340,206,-6],[310,184,-6]].map(([x,y,r]) => `<g transform="rotate(${r} ${x} ${y})"><rect x="${x-80}" y="${y-18}" width="160" height="36" rx="18" fill="#5c9b45"/><path d="M${x-70} ${y-6} H${x+70}" stroke="#7fbf63" stroke-width="3"/><path d="M${x-40} ${y-18} V${y+18} M${x} ${y-18} V${y+18} M${x+40} ${y-18} V${y+18}" stroke="#e6d6a8" stroke-width="4"/></g>`).join("")}
+        <path d="M384 262 L470 246 L484 262 L398 278Z" fill="#7fbf63"/><g transform="rotate(-10 432 250)"><rect x="396" y="236" width="76" height="28" rx="14" fill="#f9f5ed"/><rect x="396" y="236" width="76" height="10" rx="5" fill="#fff"/></g>`, i, {suelo:false}),
+      espagueti: i => escena(`${mesa}
+        <path d="M232 194 Q252 150 286 170 Q300 140 334 160 Q356 136 384 168 Q414 162 410 194Z" fill="#f2d27a"/>
+        <path d="M244 192 q14 -26 30 -6 q14 -30 30 -4 q16 -28 30 0 q16 -24 30 0 q14 -18 22 4" stroke="#e0b44e" stroke-width="3" fill="none"/>
+        <path d="M268 178 Q300 150 340 162 Q372 160 380 180 Q330 172 268 178Z" fill="#c8453b"/>
+        <circle cx="298" cy="166" r="13" fill="#7a3f24"/><circle cx="336" cy="160" r="14" fill="#7a3f24"/><circle cx="360" cy="174" r="11" fill="#7a3f24"/>
+        <path d="M206 190 H434 Q424 268 320 270 Q216 268 206 190Z" fill="#f6f2e8"/><path d="M206 190 H434" stroke="#e1dccf" stroke-width="6"/><path d="M228 214 H412" stroke="#6aa3f0" stroke-width="5"/>
+        <g transform="rotate(24 470 170)"><rect x="466" y="120" width="8" height="130" rx="3" fill="#cfd6e2"/><path d="M458 92 V120 Q470 132 482 120 V92 M466 92 V114 M474 92 V114" stroke="#cfd6e2" stroke-width="4" fill="none"/></g>`, i, {suelo:false}),
+
+      // --- Pregunta 8 ---
+      petardos: i => escena(`${estallido(240, 100, 60, "#f4be62")}${estallido(400, 90, 54, "#e85d5d")}${estallido(322, 176, 42, "#6aa3f0")}
+        <path d="M140 210 q-14 20 0 40 M122 200 q-22 30 0 60 M500 210 q14 20 0 40 M518 200 q22 30 0 60" stroke="#f9f5ed" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+        <path d="M300 272 L310 230 H334 L344 272Z" fill="#c8453b"/><path d="M322 230 Q326 214 334 210" stroke="#f9f5ed" stroke-width="2" fill="none"/>`, i),
+      carrera: i => escena(`<path d="M0 230 H640 V320 H0Z" fill="#b5513f"/>
+        <path d="M0 252 H640 M0 278 H640 M0 304 H640" stroke="#f9f5ed" stroke-width="3" opacity=".75"/>
+        <rect x="460" y="90" width="6" height="182" fill="#cfd6e2"/>
+        <g>${Array.from({length:12}, (_, k) => `<rect x="${466 + (k%4)*14}" y="${92 + Math.floor(k/4)*14}" width="14" height="14" fill="${(k + Math.floor(k/4))%2 ? "#1b1d26" : "#f9f5ed"}"/>`).join("")}</g>
+        <g transform="translate(302 0)">
+          <circle cx="12" cy="120" r="18" fill="#c98d62"/><path d="M-6 116 Q-2 98 14 100 Q28 102 30 114 Q14 106 -6 116Z" fill="#2b211d"/>
+          <path d="M4 140 L-6 200" stroke="#3d7bd9" stroke-width="26" stroke-linecap="round"/>
+          <path d="M-6 200 L-38 230 L-46 262 M-6 200 L28 226 L22 266" stroke="#c98d62" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 152 L-30 178 L-46 162 M4 152 L36 168 L52 146" stroke="#c98d62" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="-12" y="152" width="22" height="18" fill="#fff"/><text x="-1" y="166" text-anchor="middle" ${FONT} font-weight="800" font-size="13" fill="#1b2133">7</text></g>
+        <path d="M200 150 H240 M190 180 H236 M206 210 H244" stroke="#f9f5ed" stroke-width="4" stroke-linecap="round" opacity=".6"/>`, i, {suelo:false}),
+      regalos: i => escena(`${regalo(196, 178, 96, 94, "#c8453b", "#f4be62")}${regalo(308, 136, 110, 136, "#3d7bd9", "#f9f5ed")}${regalo(430, 200, 72, 72, "#5ec1a1", "#e86d8a")}`, i),
+      rezar: i => escena(`${brillo(320, 150, 130, .55)}${vela(190, 284, 60)}${vela(450, 284, 60)}
+        <g transform="translate(320 0)">
+          <path d="M-58 284 L-50 196 Q-46 166 -16 162 H16 Q46 166 50 196 L58 284Z" fill="#3f5f8a"/>
+          <path d="M-12 160 L0 176 L12 160Z" fill="#f9f5ed"/>
+          <g transform="rotate(10 0 132)"><circle cy="128" r="30" fill="#c98d62"/><path d="M-30 126 Q-30 92 0 92 Q30 92 30 126 Q16 110 0 112 Q-16 110 -30 126Z" fill="#2b211d"/>
+            <path d="M-16 134 q6 5 12 0 M4 134 q6 5 12 0" stroke="#5a3a28" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+          <path d="M-40 236 Q-30 214 -8 210 M40 236 Q30 214 8 210" stroke="#33507a" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <path d="M0 168 C-10 176 -16 194 -14 214 H14 C16 194 10 176 0 168Z" fill="#d49a6a"/><path d="M0 172 V214" stroke="#8a5a3a" stroke-width="2"/>
+          ${Array.from({length:9}, (_, k) => `<circle cx="${(Math.sin(k/8*Math.PI*2)*12).toFixed(1)}" cy="${(226 + k*4).toFixed(1)}" r="3.5" fill="#f4be62"/>`).join("")}</g>`, i),
+
+      // --- Pregunta 9 ---
+      ayudar: i => escena(`${brillo(320, 150, 120, .3)}
+        ${persona(246, 284, 1.45, "#3d7bd9")}${persona(396, 284, 1.35, "#5ec1a1", "#b07148", "#4a3326")}
+        <path d="M262 210 L298 206" stroke="#c98d62" stroke-width="15" stroke-linecap="round"/><path d="M380 210 L346 206" stroke="#b07148" stroke-width="14" stroke-linecap="round"/>
+        <ellipse cx="322" cy="204" rx="46" ry="10" fill="#f6f2e8"/><ellipse cx="322" cy="192" rx="30" ry="13" fill="#5c9b45"/><path d="M306 192 V203 M322 189 V205 M338 192 V203" stroke="#e6d6a8" stroke-width="3"/>
+        <path d="M320 126 c-16 -14 -32 -2 -25 12 c4 9 25 21 25 21 c0 0 21 -12 25 -21 c7 -14 -9 -26 -25 -12z" fill="#e8577a"/>`, i),
+      dinero: i => escena(`<path d="M282 130 Q256 112 284 102 L356 102 Q384 112 358 130 Q438 182 412 252 Q320 280 228 252 Q202 182 282 130Z" fill="#c99a52"/>
+        <path d="M282 130 Q320 142 358 130" stroke="#8a613b" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M300 102 L320 82 L340 102" fill="#c99a52"/>
+        <text x="320" y="230" text-anchor="middle" ${FONT} font-weight="800" font-size="72" fill="#7a5426">$</text>
+        ${[0,1,2,3].map(k => `<ellipse cx="460" cy="${264-k*12}" rx="26" ry="9" fill="#d99a3e"/><ellipse cx="460" cy="${260-k*12}" rx="26" ry="9" fill="#f4be62"/>`).join("")}
+        <g transform="rotate(-14 182 236)"><rect x="132" y="216" width="104" height="48" rx="5" fill="#5ea36f"/><circle cx="184" cy="240" r="13" fill="#4a8a5a"/><rect x="138" y="222" width="92" height="36" rx="3" fill="none" stroke="#8fd0a0" stroke-width="2"/></g>`, i),
+      puerta: i => escena(`<rect x="150" y="60" width="340" height="212" fill="#6b5a64"/>
+        ${Array.from({length:8}, (_, r) => Array.from({length:5}, (_, c) => `<rect x="${150 + c*68 + (r%2)*34 - 34}" y="${60 + r*26.5}" width="66" height="24.5" fill="#7a6873"/>`).join("")).join("")}
+        <rect x="140" y="60" width="10" height="212" fill="#271f35" opacity=".0"/>
+        <path d="M250 272 V122 Q250 88 320 88 Q390 88 390 122 V272Z" fill="#5b3622"/>
+        <path d="M285 96 V272 M320 88 V272 M355 96 V272" stroke="#47291a" stroke-width="3"/>
+        <path d="M244 160 L396 210 M396 160 L244 210" stroke="#9aa4b6" stroke-width="6" stroke-dasharray="14 4"/>
+        <path d="M308 176 V164 Q308 150 320 150 Q332 150 332 164 V176" stroke="#cfd6e2" stroke-width="6" fill="none"/><rect x="300" y="174" width="40" height="34" rx="5" fill="#f4be62"/><circle cx="320" cy="189" r="5" fill="#5a3a12"/>`, i, {suelo:"#00000044"}),
+      telefonos: i => escena(`${[[236,-12,"#6aa3f0"],[320,0,"#d873d6"],[404,12,"#5ec1a1"]].map(([x,r,c]) => `<g transform="rotate(${r} ${x} 180)"><rect x="${x-42}" y="96" width="84" height="168" rx="14" fill="#1b1d26"/><rect x="${x-35}" y="110" width="70" height="138" rx="6" fill="${c}"/><rect x="${x-12}" y="102" width="24" height="4" rx="2" fill="#3a3f4f"/>
+          <rect x="${x-25}" y="124" width="22" height="22" rx="5" fill="#fff" opacity=".45"/><rect x="${x+3}" y="124" width="22" height="22" rx="5" fill="#fff" opacity=".45"/><rect x="${x-25}" y="152" width="22" height="22" rx="5" fill="#fff" opacity=".45"/></g>`).join("")}
+        <g transform="rotate(14 470 100)"><path d="M440 84 H492 L506 100 L492 116 H440Z" fill="#f4be62"/><text x="466" y="106" text-anchor="middle" ${FONT} font-weight="800" font-size="15" fill="#5a3a12">NEW</text></g>`, i),
+
+      // --- Pregunta 10 ---
+      juguetes: i => escena(`<g fill="#b9844f"><circle cx="270" cy="128" r="18"/><circle cx="334" cy="128" r="18"/><ellipse cx="302" cy="226" rx="54" ry="50"/><circle cx="302" cy="160" r="42"/>
+          <ellipse cx="246" cy="214" rx="16" ry="26" transform="rotate(30 246 214)"/><ellipse cx="358" cy="214" rx="16" ry="26" transform="rotate(-30 358 214)"/><ellipse cx="268" cy="272" rx="22" ry="14"/><ellipse cx="336" cy="272" rx="22" ry="14"/></g>
+        <circle cx="270" cy="128" r="9" fill="#e3b88a"/><circle cx="334" cy="128" r="9" fill="#e3b88a"/><ellipse cx="302" cy="176" rx="18" ry="13" fill="#e3b88a"/><ellipse cx="302" cy="170" rx="6" ry="4" fill="#3a2516"/>
+        <circle cx="286" cy="152" r="5" fill="#3a2516"/><circle cx="318" cy="152" r="5" fill="#3a2516"/><path d="M290 196 L302 206 L314 196 L302 202Z" fill="#c8453b"/>
+        <rect x="398" y="226" width="48" height="48" rx="5" fill="#6aa3f0"/><text x="422" y="261" text-anchor="middle" ${FONT} font-weight="800" font-size="28" fill="#fff">A</text>
+        <rect x="430" y="178" width="48" height="48" rx="5" fill="#e85d5d"/><text x="454" y="213" text-anchor="middle" ${FONT} font-weight="800" font-size="28" fill="#fff">B</text>
+        <circle cx="190" cy="252" r="22" fill="#f4be62"/><path d="M168 252 H212 M190 230 V274" stroke="#d99a3e" stroke-width="4"/>`, i),
+      paloma: i => escena(`${brillo(320, 120, 140, .5)}
+        <g transform="translate(320 120)">
+          <path d="M-10 6 C-40 -20 -90 -60 -128 -56 C-104 -40 -84 -18 -60 0Z" fill="#dfe4ee"/>
+          <path d="M-60 6 Q-20 -14 30 -6 Q60 0 70 -16 Q80 -22 86 -14 Q86 -2 74 2 Q58 30 10 34 Q-40 34 -82 20 Q-96 34 -112 30 Q-100 18 -94 10Z" fill="#f9f5ed"/>
+          <path d="M-6 0 C10 -40 40 -80 82 -90 C70 -60 50 -24 24 0Z" fill="#eef1f7"/><path d="M24 0 C40 -26 56 -50 72 -64" stroke="#c8cfdd" stroke-width="2" fill="none"/>
+          <circle cx="74" cy="-12" r="3" fill="#26304a"/><path d="M86 -14 L98 -10 L86 -6Z" fill="#f4be62"/>
+          <path d="M98 -10 q12 4 14 14 M104 -8 q10 -2 14 -10" stroke="#5c9b45" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+        ${vela(236, 286, 42)}${vela(320, 286, 54)}${vela(404, 286, 42)}`, i),
+      peliculas: i => escena(`<g transform="rotate(-8 280 190)"><rect x="176" y="150" width="200" height="118" rx="6" fill="#1b1d26"/>
+          <g transform="rotate(-14 176 150)"><rect x="176" y="118" width="200" height="30" rx="4" fill="#1b1d26"/>${[0,1,2,3,4].map(k => `<path d="M${190+k*38} 118 l20 0 l-14 30 l-20 0Z" fill="#f9f5ed"/>`).join("")}</g>
+          ${[0,1,2,3,4].map(k => `<path d="M${190+k*38} 150 l20 0 l-14 24 l-20 0Z" fill="#f9f5ed"/>`).join("")}
+          <path d="M196 200 H356 M196 226 H300" stroke="#5b636f" stroke-width="4"/></g>
+        ${[0,1,2,3,4,5,6].map(k => `<circle cx="${388 + (k%4)*20}" cy="${150 - Math.floor(k/4)*16 + (k%2)*6}" r="14" fill="#fff4d0"/>`).join("")}
+        <path d="M384 158 H466 L456 272 H394Z" fill="#f9f5ed"/><path d="M398 158 L404 272 M424 158 V272 M450 158 L444 272" stroke="#c8453b" stroke-width="10"/>`, i),
+      videojuegos: i => escena(`<path d="M196 170 Q210 136 250 140 H350 Q390 136 404 170 L428 244 Q432 272 406 272 Q388 272 374 248 L360 226 H240 L226 248 Q212 272 194 272 Q168 272 172 244Z" fill="#3a3f4f"/>
+        <path d="M244 178 H262 V160 H280 V178 H298 V196 H280 V214 H262 V196 H244Z" fill="#9aa4b6"/>
+        <circle cx="352" cy="170" r="10" fill="#e85d5d"/><circle cx="374" cy="190" r="10" fill="#5ec1a1"/><circle cx="330" cy="190" r="10" fill="#6aa3f0"/><circle cx="352" cy="210" r="10" fill="#f4be62"/>
+        <g transform="translate(470 0)"><path d="M-30 52 H30 V82 Q30 116 0 120 Q-30 116 -30 82Z" fill="#f4be62"/><path d="M-30 60 Q-52 62 -48 82 Q-44 96 -26 96 M30 60 Q52 62 48 82 Q44 96 26 96" stroke="#f4be62" stroke-width="6" fill="none"/>
+          <rect x="-6" y="118" width="12" height="18" fill="#d99a3e"/><rect x="-22" y="134" width="44" height="12" rx="3" fill="#d99a3e"/>${estrella(0, 82, 12, "#fff4d0")}</g>`, i)
+    };
+
+    function ilustracion(opcion, indice) {
+      const dibujar = dibujos[opcion.dibujo];
+      const svg = dibujar ? dibujar(indice) : escena(`<text x="320" y="180" text-anchor="middle" ${FONT} font-size="28" fill="#f9f5ed">?</text>`, indice);
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
     }
 
     // =============================================================
-    // 3. FUNCIONAMIENTO DEL QUIZ: no hace falta cambiar este bloque.
+    // 3. FUNCIONAMIENTO DEL QUIZ.
     // =============================================================
     const $ = id => document.getElementById(id);
     let actual = 0, aciertos = 0, respondida = false;
     let historial = [];
+    let preguntasJuego = [];
+    let nombreParticipante = "";
+
+    // Mezcla Fisher–Yates: crea una copia para no alterar el banco original.
+    function mezclar(elementos) {
+      const copia = [...elementos];
+      for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+      }
+      return copia;
+    }
+
+    const CATEGORIAS = ["clothing", "songs", "souls and memory", "gifts", "date", "country", "food", "prayer", "visits", "community"];
+
+    // Extrae una pregunta al azar por tema y mezcla preguntas y opciones.
+    // Recalcula el índice correcto para conservar una única respuesta válida.
+    function crearPreguntasDelIntento() {
+      const banco = mezclar(CATEGORIAS.map(categoria =>
+        mezclar(preguntas.filter(p => p.categoria === categoria))[0]
+      ));
+      return banco.map(p => {
+        const opcionesMarcadas = p.opciones.map((opcion, indice) => ({ opcion, indiceOriginal: indice }));
+        const opcionesMezcladas = mezclar(opcionesMarcadas);
+        return {
+          ...p,
+          opciones: opcionesMezcladas.map(item => item.opcion),
+          correcta: opcionesMezcladas.findIndex(item => item.indiceOriginal === p.correcta)
+        };
+      });
+    }
 
     function mostrar(seccion) {
       ["welcome","quiz","results"].forEach(id => $(id).classList.toggle("hidden", id !== seccion));
     }
+    // Diez calabazas: se encienden con cada acierto.
+    const CALABAZA = `<svg viewBox="0 0 40 36" aria-hidden="true"><path class="stem" d="M19 4 q1-4 5-4 l1 2 q-3 1-3 4Z"/>
+      <path class="body" d="M20 6 C8 4 1 12 1 21 C1 31 9 35 20 34 C31 35 39 31 39 21 C39 12 32 4 20 6Z"/>
+      <path class="face" d="M10 17 l5-4 l2 6Z M30 17 l-5-4 l-2 6Z M9 24 q11 8 22 0 l-3 4 l-3-2 l-3 3 l-3-3 l-3 3 l-3-3 l-3 2Z"/></svg>`;
+    function pintarCalabazas() {
+      const lista = $("pumpkins");
+      if (!lista.children.length) preguntasJuego.forEach(() => { const li = document.createElement("li"); li.innerHTML = CALABAZA; lista.append(li); });
+      [...lista.children].forEach((li, i) => {
+        const h = historial[i];
+        li.className = h ? (h.acertada ? "done" : "missed") : (i === actual ? "current" : "");
+        li.title = h ? `Question ${i+1}: ${h.acertada ? "correct" : "not correct"}` : `Question ${i+1}`;
+      });
+    }
     function iniciar() {
+      const nombre = $("participantName").value.trim();
+      if (!nombre) {
+        $("participantName").setCustomValidity("Please write your name.");
+        $("participantName").reportValidity();
+        return;
+      }
+      nombreParticipante = nombre;
+      preguntasJuego = crearPreguntasDelIntento();
       actual = 0; aciertos = 0; respondida = false; historial = [];
+      $("pumpkins").replaceChildren();
+      $("review").replaceChildren();
+      $("finalScore").textContent = "";
+      $("closing").textContent = "";
+      $("participantQuiz").textContent = `Player: ${nombreParticipante}`;
+      $("participantResult").textContent = `Player: ${nombreParticipante}`;
       mostrar("quiz"); pintarPregunta();
     }
     function pintarPregunta() {
       respondida = false;
-      const p = preguntas[actual];
+      const p = preguntasJuego[actual];
       $("question").textContent = p.pregunta;
-      $("counter").textContent = `Question ${actual + 1} of ${preguntas.length}`;
-      $("scoreLive").textContent = `Score: ${aciertos}`;
-      $("fill").style.width = `${(actual / preguntas.length) * 100}%`;
-      $("progress").setAttribute("aria-valuenow", String(actual));
+      $("counter").textContent = `Question ${actual + 1} of ${preguntasJuego.length}`;
+      $("scoreLive").textContent = String(aciertos);
+      pintarCalabazas();
       $("feedback").textContent = "";
       $("feedback").className = "feedback";
       $("next").classList.add("hidden");
@@ -259,7 +1450,7 @@
         boton.type = "button"; boton.className = "answer";
         const img = document.createElement("img");
         img.src = opcion.imagen || ilustracion(opcion, indice);
-        img.alt = opcion.texto;
+        img.alt = ""; // La etiqueta visible ya da nombre al botón.
         img.loading = "eager";
         // Una URL rota vuelve a la ilustración local.
         img.addEventListener("error", () => {
@@ -272,11 +1463,12 @@
         boton.addEventListener("click", () => responder(indice));
         contenedor.append(boton);
       });
+      $("question").focus();
     }
     function responder(indice) {
       if (respondida) return; // Impide sumar puntos varias veces.
       respondida = true;
-      const p = preguntas[actual];
+      const p = preguntasJuego[actual];
       const esCorrecta = indice === p.correcta;
       if (esCorrecta) aciertos++;
       historial.push({ pregunta:p.pregunta, correcta:p.opciones[p.correcta].texto, acertada:esCorrecta });
@@ -286,40 +1478,61 @@
         else if (i === indice) boton.classList.add("incorrect");
       });
       $("feedback").className = `feedback ${esCorrecta ? "good" : "bad"}`;
-      $("feedback").textContent = `${esCorrecta ? "Correct!" : "Not quite."} ${p.explicacion}`;
-      $("scoreLive").textContent = `Score: ${aciertos}`;
-      $("next").textContent = actual === preguntas.length - 1 ? "See results →" : "Next question →";
+      $("feedback").replaceChildren();
+      const veredicto = document.createElement("strong");
+      veredicto.textContent = esCorrecta ? "Correct!" : "Incorrect.";
+      $("feedback").append(veredicto, " ", p.explicacion);
+      pintarCalabazas();
+      $("scoreLive").textContent = String(aciertos);
+      $("next").textContent = actual === preguntasJuego.length - 1 ? "See results" : "Next question";
       $("next").classList.remove("hidden");
     }
     function continuar() {
       if (!respondida) return;
       actual++;
-      if (actual < preguntas.length) pintarPregunta();
+      if (actual < preguntasJuego.length) pintarPregunta();
       else finalizar();
     }
     function finalizar() {
       mostrar("results");
-      $("finalScore").textContent = `${aciertos} / ${preguntas.length}`;
-      $("closing").textContent = aciertos === preguntas.length
+      $("finalScore").textContent = `${aciertos} / ${preguntasJuego.length}`;
+      $("closing").textContent = aciertos === preguntasJuego.length
         ? "Excellent! All ten answers are correct."
         : "You finished the quiz! Read the answers. You can try again.";
-      $("fill").style.width = "100%";
       const lista = $("review"); lista.replaceChildren();
       historial.forEach(item => {
         const li = document.createElement("li");
-        li.textContent = `${item.acertada ? "✓" : "✕"} ${item.pregunta} — ${item.correcta}`;
+        const marca = document.createElement("span");
+        marca.className = item.acertada ? "ok" : "no";
+        marca.textContent = item.acertada ? "✓" : "✕";
+        marca.setAttribute("aria-hidden", "true");
+        const texto = document.createElement("span");
+        const respuesta = document.createElement("em");
+        respuesta.textContent = item.correcta;
+        texto.append(`${item.acertada ? "Correct" : "Incorrect"}: ${item.pregunta} `, respuesta);
+        li.append(marca, texto);
         lista.append(li);
       });
+      $("resultsTitle").focus();
     }
-    // Comprobación para detectar errores al editar el banco de preguntas.
-    if (preguntas.length !== 10 || preguntas.some(p =>
-      p.opciones.length !== 4 || !Number.isInteger(p.correcta) || p.correcta < 0 || p.correcta > 3
-    )) {
-      throw new Error("The quiz must have 10 questions, four choices each, and a correct index from 0 to 3.");
+    // Comprueba el banco completo y la presencia de los diez temas.
+    if (preguntas.length !== 20 || preguntas.some(p =>
+      !CATEGORIAS.includes(p.categoria) || p.opciones.length !== 4 ||
+      p.opciones.some(o => !o.imagen && typeof dibujos[o.dibujo] !== "function") ||
+      !Number.isInteger(p.correcta) || p.correcta < 0 || p.correcta > 3
+    ) || CATEGORIAS.some(categoria => !preguntas.some(p => p.categoria === categoria))) {
+      throw new Error("The bank must have 20 valid questions across all ten topics.");
     }
-    $("start").addEventListener("click", iniciar);
+    // En pantallas estrechas la escena se ancla a la derecha (luna, zombi y calabazas).
+    const estrecha = matchMedia("(max-width: 700px)");
+    const encuadre = () => $("sceneSvg").setAttribute("preserveAspectRatio", estrecha.matches ? "xMaxYMax slice" : "xMidYMax slice");
+    encuadre();
+    if (typeof estrecha.addEventListener === "function") estrecha.addEventListener("change", encuadre);
+    else if (typeof estrecha.addListener === "function") estrecha.addListener(encuadre);
+    $("participantName").addEventListener("input", () => $("participantName").setCustomValidity(""));
+    $("startForm").addEventListener("submit", event => { event.preventDefault(); iniciar(); });
     $("next").addEventListener("click", continuar);
-    $("restart").addEventListener("click", iniciar);
+    $("restart").addEventListener("click", iniciar); // Nuevo intento: vuelve a mezclar.
   </script>
 </body>
 </html>
